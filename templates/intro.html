@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CodeKeys - {{ lang|capitalize }} Intro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+  body {
+    height: 100vh;
+    overflow: hidden; /* Lock the screen */
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
+}
+
+/* Reduce padding to pull everything up */
+.hero {
+    padding: 20px 10% 10px 10% !important; /* Minimal top/bottom padding */
+}
+
+.hero h1 { 
+    font-size: 1.8rem !important; /* Smaller heading */
+    margin: 0; 
+}
+
+.hero p { margin-top: 5px; font-size: 0.9rem; }
+
+/* Adjust card to fit smaller screens */
+.card {
+    max-width: 550px !important; /* Slightly narrower */
+    padding: 25px 35px !important; /* Tighter internal space */
+    margin-top: 10px;
+}
+
+.card h3 { 
+    font-size: 1.2rem; 
+    margin-bottom: 15px; 
+}
+
+.card ul li { 
+    font-size: 0.85rem !important; /* Smaller text for the list */
+    margin-bottom: 8px !important; 
+}
+
+
+
+.card-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 50px;
+}
+
+/* Frosted Glass Card */
+
+
+.card:hover {
+    box-shadow: 0 0 30px var(--hover-glow);
+    border-color: var(--accent-primary) !important;
+}
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+.card ul li strong { color: var(--accent-primary); }
+  #authModal {
+    display: none; /* Controlled by JS */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Dim the background */
+    backdrop-filter: blur(8px);    /* Blur the background */
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: var(--bg-card) !important; /* Use your dark slate blue */
+    border: 1px solid var(--border-glass);
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Fix Input Styles inside Modal */
+.auth-form input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
+    color: white;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.tab-btn.active {
+    color: var(--accent-primary);
+    border-bottom: 2px solid var(--accent-primary);
+}
+  </style>
+</head>
+<body >
+
+<div id="successToast" class="success-toast"></div>
+
+<div id="authModal">
+    <div class="modal-content">
+        <h2 style="color:#2c3e50; margin-bottom:10px;">Welcome to CodeKeys</h2>
+        
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+            <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+        
+        <div id="login-form" class="auth-form active">
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <div id="login-error" class="error-message"></div>
+            <button onclick="login()" class="btn-main">Login →</button>
+        </div>
+        
+        <div id="signup-form" class="auth-form">
+            <input type="text" id="signup-name" placeholder="Full Name" required>
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <div id="signup-error" class="error-message"></div>
+            <button onclick="signup()" class="btn-main">Create Account →</button>
+        </div>
+        
+        <button onclick="closeModal()" class="close-modal-btn">Close</button>
+    </div>
+</div>
+
+<nav>
+    <div class="logo">CodeKeys</div>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="javascript:void(0)" onclick="checkAndGoToDashboard()">Dashboard</a>
+        <a href="/courses/python">Courses</a>
+        <div id="auth-section">
+            <a href="javascript:void(0)" onclick="openModal()" class="nav-btn">Login / Sign Up</a>
+        </div>
+    </div>
+</nav>
+<div class="hero" >
+    <h1 style="text-transform: capitalize;">Welcome to {{ lang }}</h1>
+    <p style="max-width: 600px; margin: 0 auto;">{{ description }}</p>
+</div>
+
+<div class="card-section" >
+    <div class="card" style="width: 600px; text-align: left;">
+        <h3 style="color: #2980b9;">Before You Start Typing</h3>
+        <ul style="line-height: 1.8; color: #444;">
+            <li>✓ <strong>Sit up straight:</strong> Good posture helps you type faster.</li>
+            <li>✓ <strong>Wrists:</strong> Place them comfortably on the desk.</li>
+            <li>✓ <strong>Home Row:</strong> Left fingers on A-S-D-F, Right on J-K-L-;</li>
+            <li>✓ <strong>Thumbs:</strong> Should rest on the spacebar.</li>
+            <li style="color: #e74c3c;">⚠ <strong>Never look at the keyboard:</strong> The screen will guide you.</li>
+        </ul>
+        
+      <div style="text-align: center; margin-top: 30px;">
+    <button onclick="checkAndStartLesson()" class="btn-main" id="startLessonBtn">
+        Start Lesson One: Home Row →
+    </button>
+</div>
+    </div>
+</div>
+
+<script>
+    let pendingUrl = null;
+    let lessonUrl = '/lesson/{{ lang }}/1';
+    
+    function checkAndGoToDashboard() {
+        fetch('/check_auth')
+            .then(res => res.json())
+            .then(data => {
+                if (data.logged_in) {
+                    window.location.href = '/dashboard';
+                } else {
+                    pendingUrl = '/dashboard';
+                    openModal();
+                }
+            });
+    }
+    
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('successToast');
+        toast.textContent = message;
+        toast.style.backgroundColor = isError ? '#e74c3c' : '#2ecc71';
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+    
+    function checkAndStartLesson() {
+        fetch('/check_auth')
+            .then(res => res.json())
+            .then(data => {
+                if (data.logged_in) {
+                    window.location.href = lessonUrl;
+                } else {
+                    pendingUrl = lessonUrl;
+                    openModal();
+                }
+            });
+    }
+    
+    function switchTab(tab) {
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const tabs = document.querySelectorAll('.tab-btn');
+        
+        if (tab === 'login') {
+            loginForm.classList.add('active');
+            signupForm.classList.remove('active');
+            tabs[0].classList.add('active');
+            tabs[1].classList.remove('active');
+        } else {
+            loginForm.classList.remove('active');
+            signupForm.classList.add('active');
+            tabs[0].classList.remove('active');
+            tabs[1].classList.add('active');
+        }
+        
+        document.getElementById('login-error').style.display = 'none';
+        document.getElementById('signup-error').style.display = 'none';
+    }
+    
+    function login() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errorDiv = document.getElementById('login-error');
+        
+        if (!email || !password) {
+            errorDiv.textContent = 'Please fill in all fields';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Login successful!');
+                closeModal();
+                if (pendingUrl) {
+                    const url = pendingUrl;
+                    pendingUrl = null;
+                    window.location.href = url;
+                } else {
+                    window.location.href = lessonUrl;
+                }
+            } else {
+                errorDiv.textContent = data.message;
+                errorDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            errorDiv.textContent = 'Login failed. Please try again.';
+            errorDiv.style.display = 'block';
+        });
+    }
+    
+    function signup() {
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const errorDiv = document.getElementById('signup-error');
+        
+        if (!name || !email || !password) {
+            errorDiv.textContent = 'Please fill in all fields';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        fetch('/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Account created successfully!');
+                closeModal();
+                if (pendingUrl) {
+                    const url = pendingUrl;
+                    pendingUrl = null;
+                    window.location.href = url;
+                } else {
+                    window.location.href = lessonUrl;
+                }
+            } else {
+                errorDiv.textContent = data.message;
+                errorDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            errorDiv.textContent = 'Signup failed. Please try again.';
+            errorDiv.style.display = 'block';
+        });
+    }
+    
+    function openModal() {
+document.getElementById('authModal').style.display = 'flex';
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-password').value = '';
+        document.getElementById('signup-name').value = '';
+        document.getElementById('signup-email').value = '';
+        document.getElementById('signup-password').value = '';
+        document.getElementById('login-error').style.display = 'none';
+        document.getElementById('signup-error').style.display = 'none';
+    }
+    
+    function closeModal() {
+        document.getElementById('authModal').style.display = 'none';
+    }
+    
+    window.onclick = function(event) {
+        const modal = document.getElementById('authModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>
+</body>
+</html>

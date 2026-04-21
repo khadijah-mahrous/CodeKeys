@@ -1,0 +1,204 @@
+:root {
+    /* New Vibrant Palette */
+    --bg-deep: #0a0a0c;
+    --bg-glass: rgba(255, 255, 255, 0.03);
+    --accent-primary: #8b5cf6; /* Electric Violet */
+    --accent-secondary: #06b6d4; /* Cyber Cyan */
+    --text-bright: #ffffff;
+    --text-dim: #a1a1aa;
+    --border-glass: rgba(255, 255, 255, 0.1);
+    --hover-glow: rgba(139, 92, 246, 0.3);
+}
+
+body {
+    background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
+    color: var(--text-bright);
+    font-family: 'Inter', system-ui, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+}
+.target-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 3rem !important; /* Larger for better focus */
+    letter-spacing: 10px !important;
+    color: var(--text-dim);
+}
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+/* --- GLOBAL NAVIGATION ENGINE --- */
+nav {
+    flex-shrink: 0; 
+    background: rgba(10, 10, 12, 0.9) !important;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0 10%;
+    height: 75px; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; /* Keeps it at the top of the screen */
+    top: 0;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 10000;
+}
+
+.logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -2px;
+    background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+    cursor: pointer;
+}
+
+.nav-links {
+    display: flex;
+    gap: 35px;
+    align-items: center;
+}
+
+.nav-links a {
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    color: var(--text-bright) !important;
+    text-decoration: none;
+    opacity: 0.8;
+    transition: 0.3s ease;
+    font-weight: 600;
+}
+
+.nav-links a:hover {
+    opacity: 1;
+    color: var(--accent-secondary) !important;
+    text-shadow: 0 0 10px var(--accent-primary);
+}
+.result-wrapper div:first-child {
+    animation: pulse 2s infinite ease-in-out;
+}
+/* When a user types correctly */
+.target-text span.correct {
+    color: var(--accent-secondary);
+    text-shadow: 0 0 10px var(--accent-secondary);
+}
+
+
+/* User Info specific spacing */
+.user-info {
+    margin-left: 20px;
+    border-left: 1px solid var(--border-glass);
+    padding-left: 20px;
+}
+
+
+.logo::after {
+    content: '_';
+    color: var(--accent-secondary);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+/* --- GLASS CARDS & NODES --- */
+.card, .lesson-node, .stat-box, .header-card {
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* CREATIVE HOVER: Lift + Border Glow */
+.card:hover, .lesson-node:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 30px var(--hover-glow);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+/* --- THE ULTIMATE BUTTON --- */
+.btn-main {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.btn-main:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+    transform: scale(1.05);
+}
+/* Unified Button Style */
+.btn-main, .logout-btn, .btn-small, .nav-btn, button {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.btn-main:hover, .logout-btn:hover, button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+    filter: brightness(1.1);
+}
+/* --- COURSE PATH NAVIGATION --- */
+.course-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.course-nav .tab-btn {
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-dim) !important;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.course-nav .tab-btn:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--text-bright) !important;
+    border-color: var(--accent-primary);
+}
+
+.course-nav .tab-btn.active {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: white !important;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+}

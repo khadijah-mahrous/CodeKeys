@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CodeKeys - {{ lang|capitalize }} Lesson</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+<style>
+body {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
+}
+
+.lesson-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    padding: 0 20px 60px 20px; /* Added 60px bottom padding to lift it above the taskbar */
+    box-sizing: border-box;
+}
+
+.lesson-container h2 {
+    margin-bottom: 5px; /* Tighter spacing */
+}
+
+/* --- SEMI-TRANSPARENT TERMINAL --- */
+.editor-container {
+    width: 90%;
+    max-width: 850px;
+    background: rgba(10, 10, 12, 0.7) !important; /* Semi-transparent black */
+    backdrop-filter: blur(15px); /* Professional frost effect */
+    border-radius: 12px;
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    margin: 20px 0;
+}
+
+.target-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 3.2rem !important; /* Slightly larger */
+    font-weight: 800 !important; /* EXTRA BOLD */
+    letter-spacing: 12px;
+    color: rgba(255, 255, 255, 0.2); /* Dimmer starting color */
+    z-index: 1;
+}
+.editor-body {
+    padding: 40px 30px !important; /* Reduced from 60px to save space */
+    position: relative;
+    text-align: center;
+}
+
+
+.editor-body {
+    padding: 60px 40px;
+    position: relative; /* Essential for the overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+#type-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* Hide the actual input box */
+    cursor: default;
+    z-index: 2; /* Sits on top to catch keystrokes */
+}
+
+/* This creates the "active" cursor effect on the current letter */
+.target-text span.current {
+    border-bottom: 3px solid var(--accent-secondary);
+    color: var(--text-bright);
+}
+</style>
+</head>
+<body>
+
+<nav>
+    <div class="logo" onclick="window.location.href='/'">CodeKeys</div>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/courses/python">Courses</a>
+        <div id="auth-section">
+            </div>
+    </div>
+</nav>
+<div class="lesson-container">
+    <h2>Lesson {{ lesson.id }}: {{ lesson.title }}</h2>
+    <p style="color: var(--text-dim); margin-bottom: 10px;">{{ lesson.instr }}</p>
+
+    <div class="editor-container">
+        <div class="editor-header" style="background: #161b22; padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center;">
+            <div style="display: flex; gap: 8px; margin-right: 20px;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f56;"></div>
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e;"></div>
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: #27c93f;"></div>
+            </div>
+            <span style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #8b949e;">{{ lang }}_module_{{ lesson.id }}.py</span>
+        </div>
+        
+       <div class="editor-body">
+    <div class="target-text" id="display-text">
+        {% for char in lesson.target %}
+            <span>{{ char }}</span>
+        {% endfor %}
+    </div>
+    <input type="text" id="type-input" autofocus autocomplete="off">
+</div>
+    </div>
+
+  
+</div>
+
+
+
+<script>
+    const input = document.getElementById('type-input');
+    const displaySpans = document.querySelectorAll('#display-text span');
+    
+    const target = "{{ lesson.target }}";
+    let timerStarted = false;
+    let mistakesCount = 0;
+    let totalKeystrokes = 0;  // Track ALL typing attempts
+    let completed = false;
+    let correctChars = 0;  // Track number of correct characters
+
+    input.addEventListener('keydown', function(e) {
+        if (completed) return;
+        
+        const ignoredKeys = ['Backspace', 'Shift', 'Control', 'Alt', 'CapsLock', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Delete', 'Escape'];
+        if (ignoredKeys.includes(e.key)) return;
+
+        const currentIndex = input.value.length;
+        if (currentIndex < target.length) {
+            totalKeystrokes++;
+            if (e.key !== target[currentIndex]) {
+                mistakesCount++;
+            } else {
+                correctChars++;
+            }
+        }
+        if (!timerStarted) {
+    timerStarted = true;
+    startTime = new Date();
+}
+    });
+
+    function updateHighlighting() {
+    const userValue = input.value;
+    const userChars = userValue.split('');
+    
+    displaySpans.forEach((span, i) => {
+        const expectedChar = span.innerText;
+        const userChar = userChars[i];
+        
+        // Reset classes
+        span.classList.remove('current');
+        
+        if (!userChar) {
+            span.style.color = "#334155"; // Untyped
+            if (i === userValue.length) span.classList.add('current'); // Highlight next char
+        } else if (userChar === expectedChar) {
+            span.style.color = "#2ecc71"; // Correct (Green)
+            span.style.textShadow = "0 0 10px rgba(46, 204, 113, 0.5)";
+        } else {
+            span.style.color = "#e74c3c"; // Wrong (Red)
+        }
+    });
+}
+   async function completeLesson() {
+    const endTime = new Date();
+    // Ensure startTime exists; default to 1 second if not to avoid division by zero
+    const duration = startTime ? (endTime - startTime) : 1000;
+    const timeInMinutes = duration / 60000;
+    
+    // Standard WPM: (Characters / 5) / Time in minutes
+    const wpm = Math.round((target.length / 5) / timeInMinutes) || 0;
+
+    const finalAccuracy = totalKeystrokes > 0 
+        ? Math.round(((totalKeystrokes - mistakesCount) / totalKeystrokes) * 100) 
+        : 0;
+
+    await fetch('/process_stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            lang: "{{ lang }}",
+            lesson_id: {{ lesson.id }},
+            accuracy: finalAccuracy,
+            wpm: wpm,
+            mistakes: mistakesCount,
+            total_chars: totalKeystrokes
+        })
+    });
+    window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
+}
+
+    input.addEventListener('input', function() {
+        if (completed) return;
+        
+        if (!timerStarted && input.value.length === 1) {
+            timerStarted = true;
+        }
+        
+        updateHighlighting();
+        
+        if (input.value.length >= target.length) {
+            completeLesson();
+        }
+    });
+
+    window.addEventListener('load', function() {
+        input.value = '';
+        mistakesCount = 0;
+        totalKeystrokes = 0;
+        correctChars = 0;
+        completed = false;
+        input.focus();
+        updateHighlighting(); 
+    });
+</script>
+</body>
+</html>

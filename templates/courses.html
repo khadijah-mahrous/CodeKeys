@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CodeKeys - Learning Path</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+    height: 100vh;
+    overflow: hidden; /* Lock scroll */
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
+}
+
+.path-container {
+    flex: 1;
+    padding: 20px 10%;
+    text-align: center;
+    overflow-y: auto; /* Allow scrolling ONLY inside the lesson list if needed */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}       
+
+/* Glassmorphism Lesson Nodes */
+.lesson-node { 
+    background: var(--bg-glass) !important;
+    backdrop-filter: blur(10px);
+    padding: 15px 30px; 
+    border-radius: 16px; 
+    margin: 10px 0; 
+    width: 100%;
+    max-width: 600px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    border: 1px solid var(--border-glass) !important; 
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lesson-node:hover { 
+    transform: translateX(10px); 
+    border-color: var(--accent-primary) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 0 20px var(--hover-glow);
+}
+
+.lesson-node div { color: var(--text-bright) !important; }
+.lesson-node div span { color: var(--text-dim) !important; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo" onclick="window.location.href='/'">CodeKeys</div>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/courses/python">Courses</a>
+        <div id="auth-section">
+            </div>
+    </div>
+</nav>
+<div class="path-container">
+<div class="course-nav">
+            <a href="/courses/basics" class="tab-btn {{ 'active' if lang == 'basics' }}">⌨️ Basics</a>
+        <a href="/courses/python" class="tab-btn {{ 'active' if lang == 'python' }}">🐍 Python</a>
+        <a href="/courses/javascript" class="tab-btn {{ 'active' if lang == 'javascript' }}">⚡ JavaScript</a>
+        <a href="/courses/java" class="tab-btn {{ 'active' if lang == 'java' }}">☕ Java</a>
+    </div>
+
+    <h1>{{ lang|capitalize }} Path</h1>
+    
+    {% for lesson in lessons %}
+        {# Language tracks are not locked (id 1 is always open), but Basics follow strict progression #}
+        {% set current_level = data.get(lang + '_level', 1) %}
+        {% set is_locked = (lang == 'basics' and lesson.id > current_level) %}
+        {% set score_dict = data.get(lang + '_scores', {}) %}
+        {% set best_score = score_dict.get(lesson.id|string, 0) %}
+        
+        <div class="lesson-node" style="{{ 'opacity: 0.5; filter: grayscale(1);' if is_locked }}">
+            <div style="flex: 1; text-align: left;">
+                <span style="color: var(--accent-secondary); font-family: 'JetBrains Mono';">0{{ lesson.id }}</span>
+                <h3 style="display: inline; margin-left: 15px;">{{ lesson.title }}</h3>
+                
+                {% if best_score > 0 %}
+                <div class="stars" style="margin-left: 45px;">
+                    {{ '⭐' * (3 if best_score >= 70 else 1) }}{{ '⭐' if best_score >= 85 }}{{ '⭐' if best_score >= 95 }}
+                    <small>({{ best_score }}%)</small>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if is_locked %}
+                <button class="btn-main" style="background: #334155 !important;">Locked</button>
+            {% else %}
+                <button onclick="window.location.href='/lesson/{{ lang }}/{{ lesson.id }}'" class="btn-main">
+                    {{ 'Retry' if best_score > 0 else 'Start' }}
+                </button>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    function checkAndGoToDashboard() {
+        fetch('/check_auth')
+            .then(res => res.json())
+            .then(data => {
+                if (data.logged_in) {
+                    window.location.href = '/dashboard';
+                } else {
+                    sessionStorage.setItem('pendingUrl', '/dashboard');
+                    window.location.href = '/?login_required=dashboard';
+                }
+            });
+    }
+    
+    function startLesson(lessonUrl) {
+        fetch('/check_auth')
+            .then(res => res.json())
+            .then(data => {
+                if (data.logged_in) {
+                    window.location.href = lessonUrl;
+                } else {
+                    sessionStorage.setItem('pendingLessonUrl', lessonUrl);
+                    window.location.href = '/?login_required=lesson';
+                }
+            });
+    }
+</script>
+</body>
+</html>

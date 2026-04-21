@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CodeKeys - Learn to Code</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+    height: 100vh;
+    overflow: hidden; /* This kills the scrollbar */
+    display: flex;
+    flex-direction: column;
+}
+
+.hero {
+    flex: 0 1 auto; /* Take only needed space */
+    padding: 20px 10% !important;
+    text-align: center;
+    background: transparent !important;
+}
+
+.hero h1 { font-size: 2.2rem; margin: 0; }
+.hero p { font-size: 1rem; margin: 10px 0; }
+
+.card-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Forces 3 equal columns */
+    gap: 20px;
+    padding: 40px 10%;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: stretch; /* This ensures all cards in the row take the same height */
+}
+
+.card {
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    padding: 30px !important;
+    display: flex;
+    flex-direction: column; /* Stack content vertically */
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+/* This pushes the button to the very bottom of the card */
+.card .course-btn {
+    margin-top: auto; 
+}
+
+.card img {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto;
+}
+        #authModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+        }
+        #authModal .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            width: 400px;
+            text-align: center;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: #999;
+            transition: 0.3s;
+        }
+        .tab-btn.active {
+            color: #2980b9;
+            border-bottom: 2px solid #2980b9;
+            margin-bottom: -2px;
+        }
+        .auth-form {
+            display: none;
+        }
+        .auth-form.active {
+            display: block;
+        }
+        .auth-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .auth-form input:focus {
+            border-color: #2980b9;
+            outline: none;
+        }
+        .auth-form button {
+            width: 100%;
+            margin-top: 15px;
+        }
+        .close-modal-btn {
+            background: none;
+            border: none;
+            color: #bbb;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .close-modal-btn:hover { color: #e74c3c; }
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .user-info {
+            color: white;
+            margin-left: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logout-btn {
+            background: #e74c3c;
+            padding: 5px 12px;
+            border-radius: 4px;
+            color: white !important;
+            text-decoration: none;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        .welcome-text {
+            font-size: 14px;
+            color: #2980b9;
+        }
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 100000;
+            animation: slideIn 0.3s ease;
+            display: none;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="successToast" class="success-message"></div>
+
+<nav>
+    <div class="logo" onclick="window.location.href='/'">CodeKeys</div>
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/courses/python">Courses</a>
+        <div id="auth-section">
+            </div>
+    </div>
+</nav>
+
+<div id="authModal">
+    <div class="modal-content">
+        <h2 style="color:#2c3e50; margin-bottom:10px;">Welcome to CodeKeys</h2>
+        
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+            <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+        
+        <div id="login-form" class="auth-form active">
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <div id="login-error" class="error-message"></div>
+            <button onclick="login()" class="btn-main">Login →</button>
+        </div>
+        
+        <div id="signup-form" class="auth-form">
+            <input type="text" id="signup-name" placeholder="Full Name" required>
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <div id="signup-error" class="error-message"></div>
+            <button onclick="signup()" class="btn-main">Create Account →</button>
+        </div>
+        
+        <button onclick="closeModal()" class="close-modal-btn">Close</button>
+    </div>
+</div>
+
+
+
+<div class="hero">
+    <h1>Learn to Type. Learn to Code.</h1>
+    <p>Master typing while actually learning Python, JavaScript, and Java with a personal AI coach.</p>
+<a href="/resume" class="btn-main" id="start-btn">Continue Learning</a>
+<div class="card-section">
+    <div class="card">
+        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968350.png" width="60" alt="Python">
+        <h3>Python 🐍</h3>
+        <p style="font-size: 12px; color: #666; margin: 10px 0;">Learn Python syntax while typing</p>
+        <a href="/intro/python" class="btn-small course-btn">View Course →</a>
+    </div>
+    <div class="card">
+        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968292.png" width="60" alt="JavaScript">
+        <h3>JavaScript ⚡</h3>
+        <p style="font-size: 12px; color: #666; margin: 10px 0;">Master JS fundamentals</p>
+        <a href="/intro/javascript" class="btn-small course-btn">View Course →</a>
+    </div>
+    <div class="card">
+        <img src="https://cdn-icons-png.flaticon.com/512/226/226777.png" width="60" alt="Java">
+        <h3>Java ☕</h3>
+        <p style="font-size: 12px; color: #666; margin: 10px 0;">Build strong Java skills</p>
+        <a href="/intro/java" class="btn-small course-btn">View Course →</a>
+    </div>
+</div>
+
+</div>
+<script>
+    let pendingUrl = null;
+    
+    // Check if user is already logged in
+    fetch('/check_auth')
+        .then(res => res.json())
+        .then(data => {
+            if (data.logged_in) {
+                updateUIForLoggedInUser(data.name);
+            }
+        });
+    
+    // Check URL parameters for login requirement
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('login_required') === 'dashboard') {
+        pendingUrl = '/dashboard';
+        openModal();
+    } else if (urlParams.get('login_required') === 'lesson') {
+        pendingUrl = sessionStorage.getItem('pendingLessonUrl');
+        openModal();
+    }
+    
+    function checkAndGoToDashboard() {
+        fetch('/check_auth')
+            .then(res => res.json())
+            .then(data => {
+                if (data.logged_in) {
+                    window.location.href = '/dashboard';
+                } else {
+                    pendingUrl = '/dashboard';
+                    openModal();
+                }
+            });
+    }
+    
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('successToast');
+        toast.textContent = message;
+        toast.style.backgroundColor = isError ? '#e74c3c' : '#2ecc71';
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+    
+    function switchTab(tab) {
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const tabs = document.querySelectorAll('.tab-btn');
+        
+        if (tab === 'login') {
+            loginForm.classList.add('active');
+            signupForm.classList.remove('active');
+            tabs[0].classList.add('active');
+            tabs[1].classList.remove('active');
+        } else {
+            loginForm.classList.remove('active');
+            signupForm.classList.add('active');
+            tabs[0].classList.remove('active');
+            tabs[1].classList.add('active');
+        }
+        
+        document.getElementById('login-error').style.display = 'none';
+        document.getElementById('signup-error').style.display = 'none';
+    }
+    
+    function login() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errorDiv = document.getElementById('login-error');
+        
+        if (!email || !password) {
+            errorDiv.textContent = 'Please fill in all fields';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Login successful!');
+                closeModal();
+                updateUIForLoggedInUser(data.name || email);
+                
+                if (pendingUrl) {
+                    const url = pendingUrl;
+                    pendingUrl = null;
+                    window.location.href = url;
+                } else {
+                    window.location.href = '/';
+                }
+            } else {
+                errorDiv.textContent = data.message;
+                errorDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            errorDiv.textContent = 'Login failed. Please try again.';
+            errorDiv.style.display = 'block';
+        });
+    }
+    
+    function signup() {
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const errorDiv = document.getElementById('signup-error');
+        
+        if (!name || !email || !password) {
+            errorDiv.textContent = 'Please fill in all fields';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        fetch('/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Account created successfully!');
+                closeModal();
+                updateUIForLoggedInUser(name);
+                
+                if (pendingUrl) {
+                    const url = pendingUrl;
+                    pendingUrl = null;
+                    window.location.href = url;
+                } else {
+                    window.location.href = '/';
+                }
+            } else {
+                errorDiv.textContent = data.message;
+                errorDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            errorDiv.textContent = 'Signup failed. Please try again.';
+            errorDiv.style.display = 'block';
+        });
+    }
+    
+    function updateUIForLoggedInUser(name) {
+    const authSection = document.getElementById('auth-section');
+    
+    // REPLACE the old authSection.innerHTML with this new professional version:
+    authSection.innerHTML = `
+        <span class="user-info">
+            <span class="welcome-text">👋 ${name}</span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </span>
+    `;
+    
+    // Keep the rest of the function logic for the "Start" button
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) {
+        startBtn.textContent = 'Continue Learning';
+        startBtn.href = '/courses/python';
+    }
+}
+        
+        document.querySelectorAll('.course-btn').forEach(btn => {
+            btn.href = '/intro/python';
+            btn.textContent = 'View Course →';
+        });
+    }
+    
+    function openModal() {
+        document.getElementById('authModal').style.display = 'flex';
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-password').value = '';
+        document.getElementById('signup-name').value = '';
+        document.getElementById('signup-email').value = '';
+        document.getElementById('signup-password').value = '';
+        document.getElementById('login-error').style.display = 'none';
+        document.getElementById('signup-error').style.display = 'none';
+    }
+    
+    function closeModal() {
+        document.getElementById('authModal').style.display = 'none';
+    }
+    
+    window.onclick = function(event) {
+        const modal = document.getElementById('authModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>
+</body>
+</html>
