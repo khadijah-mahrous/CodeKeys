@@ -16,20 +16,9 @@ from lessons.javascript_lessons import JAVASCRIPT_LESSONS
 from lessons.java_lessons import JAVA_LESSONS
 
 def calculate_stars(accuracy):
-    """Convert accuracy percentage to star rating (1-5)"""
-    if accuracy >= 95:
-        return 5
-    elif accuracy >= 80:
-        return 4
-    elif accuracy >= 70:
-        return 3
-    elif accuracy >= 60:
-        return 2
-    elif accuracy >= 50:
-        return 1
-    else:
-        return 0
-    
+    """Returns float from 0-5 with 0.5 increments for half-star support"""
+    return round(accuracy / 20, 1)  # 100% = 5.0, 85% = 4.25, 70% = 3.5
+
 # Lesson database - references to imported lesson arrays
 lessons_db = {
     "basics": BASICS_LESSONS,
@@ -38,7 +27,7 @@ lessons_db = {
     "java": JAVA_LESSONS
 }
 
-# Language metadata - Make sure this is defined BEFORE the routes
+# Language metadata
 LANGUAGE_INFO = {
     "basics": {
         "name": "Typing Basics",
@@ -101,7 +90,6 @@ def signup():
     
     session['user_id'] = email
     session['user_name'] = name
-    
     return jsonify({"success": True, "message": "Signup successful!"})
 
 @app.route('/login', methods=['POST'])
@@ -153,10 +141,8 @@ def courses(language):
     
     user_id = session.get('user_id')
     data = user_progress.get(user_id, {}) if user_id else {}
-    
     lang_lessons = lessons_db.get(language, [])
     
-    # Pass the calculate_stars function to the template
     return render_template('courses.html', 
                           lessons=lang_lessons, 
                           lang=language, 
@@ -172,7 +158,6 @@ def language_intro(language):
     
     user_id = session.get('user_id')
     data = user_progress.get(user_id, {"level": 1}) if user_id else {"level": 1}
-    
     lang_info = LANGUAGE_INFO.get(language, {})
     return render_template('intro.html', lang=language, description=lang_info.get('description', ''), data=data, lang_info=lang_info)
 
@@ -186,7 +171,6 @@ def lesson(language, lesson_id):
         
     user_id = session['user_id']
     data = user_progress.get(user_id, {})
-    
     track_lessons = lessons_db.get(language, [])
     current_lesson = next((l for l in track_lessons if l['id'] == lesson_id), None)
     
@@ -197,7 +181,6 @@ def lesson(language, lesson_id):
 
 @app.route('/get_next_lesson/<language>')
 def get_next_lesson(language):
-    """Returns the next available lesson ID for a specific language"""
     if 'user_id' not in session:
         return jsonify({"error": "Not logged in"}), 401
     
@@ -206,40 +189,31 @@ def get_next_lesson(language):
     
     user_email = session['user_id']
     user_data = user_progress.get(user_email, {})
-    
-    # Get current level for this language (default to 1)
     current_level = user_data.get(f"{language}_level", 1)
     total_lessons = len(lessons_db.get(language, []))
     
-    # Don't exceed total lessons
     if current_level > total_lessons:
         current_level = total_lessons
     
-    return jsonify({
-        "next_lesson_id": current_level,
-        "total_lessons": total_lessons
-    })
+    return jsonify({"next_lesson_id": current_level, "total_lessons": total_lessons})
 
 @app.route('/process_stats', methods=['POST'])
 def process_stats():
     data = request.get_json()
     email = session.get('user_id')
-    
     if not email or email not in user_progress:
         return jsonify({"status": "error"}), 404
     
     lang = data.get('lang', 'basics')
     lesson_id = int(data.get('lesson_id'))
-    new_acc = data.get('accuracy', 0)
-    wpm = data.get('wpm', 0)
-    mistakes = data.get('mistakes', 0)
-    total_chars = data.get('total_chars', 0)
     
-    # Debug print to see what's coming in
-    print(f"Processing stats - Lang: {lang}, Lesson: {lesson_id}")
-    print(f"Accuracy: {new_acc}%, WPM: {wpm}, Mistakes: {mistakes}, Total Chars: {total_chars}")
-
-    # Save for Result page
+    # Force everything to be an integer
+    new_acc = int(data.get('accuracy', 0))
+    wpm = int(data.get('wpm', 0))
+    mistakes = int(data.get('mistakes', 0))
+    total_chars = int(data.get('total_chars', 0))
+    
+    # Save for Result page session
     session['last_results'] = {
         "accuracy": new_acc, 
         "wpm": wpm, 
@@ -249,89 +223,66 @@ def process_stats():
         "lang": lang
     }
     
-    # Track progress per language
+    # Update Best Score in user_progress
     score_key = f"{lang}_scores"
-    level_key = f"{lang}_level"
-    
     if score_key not in user_progress[email]:
         user_progress[email][score_key] = {}
-    
-    # Save best accuracy
+        
     old_acc = user_progress[email][score_key].get(str(lesson_id), 0)
     if new_acc > old_acc:
         user_progress[email][score_key][str(lesson_id)] = new_acc
-        print(f"New best accuracy saved: {new_acc}% (was {old_acc}%)")
 
-    # Progression logic - only progress if accuracy >= 70 and it's the current level
+    # Progression Unlock Logic
+    level_key = f"{lang}_level"
     current_level = user_progress[email].get(level_key, 1)
-    total_lessons = len(lessons_db.get(lang, []))
-    
-    if new_acc >= 70 and lesson_id == current_level and lesson_id < total_lessons:
+    if new_acc >= 70 and lesson_id == current_level:
         user_progress[email][level_key] = current_level + 1
-        print(f"Progressed to level {current_level + 1} in {lang}")
         
     session.modified = True
     return jsonify({"status": "success"})
 
-@app.route('/resume')
-def resume_learning():
-    if 'user_id' not in session:
-        return redirect(url_for('index', login_required='lesson'))
-    
-    return redirect(url_for('courses', language='python'))
-
 @app.route('/results/<language>/<int:lesson_id>')
 def results(language, lesson_id):
-    # Get results from session
+    email = session.get('user_id')
+    if not email or email not in user_progress:
+        return redirect(url_for('index'))
+
+    # 1. Pull the session results to show stats for THIS specific attempt
     res = session.get('last_results', {})
     
-    accuracy = res.get('accuracy', 0)
-    total_chars = res.get('total_chars', 0)
-    mistakes = res.get('mistakes', 0)
-    wpm = res.get('wpm', 0)
+    # 2. Get the BEST accuracy achieved for this lesson from the "database"
+    score_dict = user_progress[email].get(f"{language}_scores", {})
+    best_accuracy = score_dict.get(str(lesson_id), 0)
     
-    # Calculate stars based on accuracy
-    if accuracy >= 95:
-        stars = 5
-        star_message = "Perfect! 🌟🌟🌟🌟🌟"
-    elif accuracy >= 80:
-        stars = 4
-        star_message = "Great! 🌟🌟🌟🌟"
-    elif accuracy >= 70:
-        stars = 3
-        star_message = "Good! 🌟🌟🌟"
-    elif accuracy >= 60:
-        stars = 2
-        star_message = "Keep practicing! 🌟🌟"
-    elif accuracy >= 50:
-        stars = 1
-        star_message = "Try again! 🌟"
-    else:
-        stars = 0
-        star_message = "Need more practice!"
+    # Use the attempt accuracy for the big circle, but verify stars
+    # Usually, users want to see the stars they JUST earned
+    current_accuracy = res.get('accuracy', 0)
+    stars = calculate_stars(current_accuracy)  # This now calls the top-level function
     
-    # Get the lesson title
+    messages = {
+        5: "Perfect! 🌟🌟🌟🌟🌟",
+        4: "Great! 🌟🌟🌟🌟",
+        3: "Good! 🌟🌟🌟",
+        2: "Keep practicing! 🌟🌟",
+        1: "Try again! 🌟",
+        0: "Need more practice!"
+    }
+    
     track_lessons = lessons_db.get(language, [])
-    lesson = next((l for l in track_lessons if l['id'] == lesson_id), None)
-    lesson_title = lesson['title'] if lesson else f"Lesson {lesson_id}"
-    
-    # Determine if passed (70% or higher)
-    passed = accuracy >= 70
-    
-    total_lessons = len(track_lessons)
+    current_lesson = next((l for l in track_lessons if l['id'] == lesson_id), None)
     
     return render_template('result.html', 
-                           accuracy=accuracy, 
-                           total_chars=total_chars,
-                           mistakes=mistakes,
-                           wpm=wpm,
+                           accuracy=current_accuracy, 
+                           total_chars=res.get('total_chars', 0),
+                           mistakes=res.get('mistakes', 0),
+                           wpm=res.get('wpm', 0),
                            lang=language,
                            lesson_id=lesson_id,
-                           lesson_title=lesson_title,
+                           lesson_title=current_lesson['title'] if current_lesson else "Lesson Complete",
                            stars=stars,
-                           star_message=star_message,
-                           passed=passed,
-                           total_lessons=total_lessons)
+                           star_message=messages.get(int(stars), "Keep going!"),
+                           passed=current_accuracy >= 70,
+                           total_lessons=len(track_lessons))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -10,17 +10,39 @@
     --hover-glow: rgba(139, 92, 246, 0.3);
 }
 
+/* Update the body to allow flexible height but contain the layout */
 body {
     background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
     color: var(--text-bright);
     font-family: 'Inter', system-ui, sans-serif;
     margin: 0;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Ensure the main dashboard wrapper fits the viewport correctly */
+.dashboard-wrapper {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 75px); /* Subtract nav height if nav is present */
+    overflow: hidden;
+}
+
+.dashboard-content {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto; /* Allow scrolling ONLY inside this container */
 }
 .target-text {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 3rem !important; /* Larger for better focus */
-    letter-spacing: 10px !important;
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+    white-space: pre;
     color: var(--text-dim);
 }
 @keyframes pulse {
@@ -35,7 +57,7 @@ nav {
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 0 10%;
-    height: 75px; 
+    height: 70px; 
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -44,6 +66,7 @@ nav {
     width: 100%;
     box-sizing: border-box;
     z-index: 10000;
+    margin-bottom: 0;
 }
 
 .logo {
@@ -201,4 +224,22 @@ nav {
     background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
     color: white !important;
     box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+}
+.logout-btn {
+    /* Changing from #e74c3c to a burgundy/violet gradient */
+    background: linear-gradient(135deg, #800020, #4a0404) !important; 
+    padding: 5px 12px !important;
+    border-radius: 4px;
+    color: white !important;
+    text-decoration: none;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.logout-btn:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 0 10px rgba(128, 0, 32, 0.4);
 }

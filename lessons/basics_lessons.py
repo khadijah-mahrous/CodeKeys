@@ -5,13 +5,13 @@ BASICS_LESSONS = [
         "id": 1,
         "title": "Home Row: Left Hand",
         "target": "aaaa ssss dddd ffff",
-        "instr": "Place left hand on A-S-D-F. Practice each key."
+"instr": "Place your left hand on A-S-D-F. Practice each key."
     },
     {
         "id": 2,
         "title": "Home Row: Right Hand",
         "target": "jjjj kkkk llll ;;;;",
-        "instr": "Place right hand on J-K-L-;. Practice each key."
+        "instr": "Place your right hand on J-K-L-;. Practice each key."
     },
     {
         "id": 3,

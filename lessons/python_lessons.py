@@ -4,7 +4,7 @@ PYTHON_LESSONS = [
     {
         "id": 1,
         "title": "Hello World",
-        "target": "print('Hello World')",
+"target": "print('Hello World')",
         "instr": "The classic first program - print() outputs text."
     },
     {
@@ -31,12 +31,14 @@ PYTHON_LESSONS = [
         "target": "age = 18\nif age >= 18:\n    print('Adult')\nelse:\n    print('Minor')",
         "instr": "if/else statements control program flow."
     },
-    {
-        "id": 6,
-        "title": "For Loops",
-        "target": "for i in range(5):\n    print(f'Number {i}')",
-        "instr": "for loops repeat code a specific number of times."
-    },
+    # Make sure it looks like this (no hidden tab characters)
+# Make sure it looks like this (no hidden tab characters)
+{
+    "id": 6,
+    "title": "For Loops",
+    "target": "for i in range(5):\n    print(f'Number {i}')",
+    "instr": "for loops repeat code a specific number of times."
+},
     {
         "id": 7,
         "title": "While Loops",

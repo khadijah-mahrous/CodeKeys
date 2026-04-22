@@ -125,13 +125,14 @@
         }
 
         .btn-retry {
-            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+            background: linear-gradient(135deg, #800020, #4a0404) !important;
             padding: 8px 16px !important;
             font-size: 0.7rem !important;
         }
 
         .btn-retry:hover {
-            background: linear-gradient(135deg, #c0392b, #a93226) !important;
+            filter: brightness(1.2);
+            box-shadow: 0 0 10px rgba(128, 0, 32, 0.4);
         }
 
         .btn-locked {
@@ -192,7 +193,6 @@
     <div class="nav-links">
         <a href="/">Home</a>
         <a href="/dashboard">Dashboard</a>
-        <a href="/courses/python">Courses</a>
         <div id="auth-section"></div>
     </div>
 </nav>
@@ -223,10 +223,10 @@
     
     {% for lesson in lessons %}
         {% set current_level = data.get(lang + '_level', 1) %}
-        {% set is_locked = (lang == 'basics' and lesson.id > current_level) %}
         {% set score_dict = data.get(lang + '_scores', {}) %}
         {% set best_score = score_dict.get(lesson.id|string, 0) %}
         {% set stars = calculate_stars(best_score) %}
+        {% set is_locked = (lesson.id > current_level) or (lesson.id > 1 and best_score < 70) %}
         
         <div class="lesson-node {% if is_locked %}locked-overlay{% endif %}">
             <div class="lesson-info">
@@ -240,14 +240,16 @@
                 <div class="stars-container">
                     <div class="stars">
                         {% for i in range(1, 6) %}
-                            {% if i <= stars %}
+                            {% if stars >= i %}
                                 <span class="star filled">★</span>
+                            {% elif stars >= i - 0.5 %}
+                                <span class="star half">★</span>
                             {% else %}
                                 <span class="star empty">☆</span>
                             {% endif %}
                         {% endfor %}
                     </div>
-                    <span class="accuracy-badge">{{ best_score }}% accuracy</span>
+                    <span class="accuracy-badge">{{ best_score }}%</span>
                 </div>
                 {% else %}
                 <div class="stars-container">
@@ -256,7 +258,7 @@
                             <span class="star empty">☆</span>
                         {% endfor %}
                     </div>
-                    <span class="accuracy-badge">Not attempted yet</span>
+                    <span class="accuracy-badge">Not Attempted</span>
                 </div>
                 {% endif %}
             </div>
@@ -265,20 +267,12 @@
                 {% if is_locked %}
                     <button class="btn-locked" disabled>🔒 Locked</button>
                 {% else %}
-                    {% if best_score > 0 %}
-                        <!-- Retry button for lessons that have been attempted -->
-                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, true)" class="btn-retry">
-                            🔄 Retry
-                        </button>
-                        <!-- Start/Continue button -->
-                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">
-                            ▶ Continue
-                        </button>
+                    {% if best_score == 0 %}
+                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">▶ Start</button>
+                    {% elif best_score < 70 %}
+                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, true)" class="btn-retry">🔄 Retry</button>
                     {% else %}
-                        <!-- Start button for new lessons -->
-                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">
-                            ▶ Start
-                        </button>
+                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">▶ Continue</button>
                     {% endif %}
                 {% endif %}
             </div>
@@ -292,7 +286,6 @@
             .then(res => res.json())
             .then(data => {
                 if (data.logged_in) {
-                    // If retry, add a parameter to track it
                     let url = `/lesson/${language}/${lessonId}`;
                     if (isRetry) {
                         url += '?retry=true';
