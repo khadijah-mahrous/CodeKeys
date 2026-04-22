@@ -2,83 +2,155 @@
 <html>
 <head>
     <title>CodeKeys - {{ lang|capitalize }} Lesson</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
-<style>
-body {
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
-}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.lesson-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; 
-    align-items: center;
-    padding: 0 20px 60px 20px; /* Added 60px bottom padding to lift it above the taskbar */
-    box-sizing: border-box;
-}
+        body {
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
+        }
 
-.lesson-container h2 {
-    margin-bottom: 5px; /* Tighter spacing */
-}
+        .lesson-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
 
-/* --- SEMI-TRANSPARENT TERMINAL --- */
-.editor-container {
-    width: 90%;
-    max-width: 850px;
-    background: rgba(10, 10, 12, 0.7) !important; /* Semi-transparent black */
-    backdrop-filter: blur(15px); /* Professional frost effect */
-    border-radius: 12px;
-    border: 1px solid var(--border-glass);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-    margin: 20px 0;
-}
+        .lesson-container h2 {
+            margin-bottom: 5px;
+            font-size: 1.5rem;
+        }
 
-.target-text {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 3.2rem !important; /* Slightly larger */
-    font-weight: 800 !important; /* EXTRA BOLD */
-    letter-spacing: 12px;
-    color: rgba(255, 255, 255, 0.2); /* Dimmer starting color */
-    z-index: 1;
-}
-.editor-body {
-    padding: 40px 30px !important; /* Reduced from 60px to save space */
-    position: relative;
-    text-align: center;
-}
+        .editor-container {
+            width: 90%;
+            max-width: 1000px;
+            background: rgba(10, 10, 12, 0.7) !important;
+            backdrop-filter: blur(15px);
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            margin: 20px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
 
+        .target-text {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 2rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 2px !important;
+            color: rgba(255, 255, 255, 0.3);
+            z-index: 1;
+            white-space: nowrap !important;
+            display: inline-block;
+            min-width: 100%;
+        }
 
-.editor-body {
-    padding: 60px 40px;
-    position: relative; /* Essential for the overlay */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-}
+        .target-text span {
+            display: inline;
+            margin: 0;
+            padding: 0;
+            letter-spacing: 2px !important;
+        }
 
-#type-input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0; /* Hide the actual input box */
-    cursor: default;
-    z-index: 2; /* Sits on top to catch keystrokes */
-}
+        .editor-body {
+            padding: 50px 40px !important;
+            position: relative;
+            text-align: center;
+            overflow-x: auto;
+            overflow-y: hidden;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-/* This creates the "active" cursor effect on the current letter */
-.target-text span.current {
-    border-bottom: 3px solid var(--accent-secondary);
-    color: var(--text-bright);
-}
-</style>
+        .editor-body::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .editor-body::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .editor-body::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 3px;
+        }
+
+        #type-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: default;
+            z-index: 2;
+        }
+
+        .target-text span.current {
+            border-bottom: 3px solid var(--accent-secondary);
+            color: var(--text-bright);
+            background: rgba(139, 92, 246, 0.2);
+            padding-bottom: 2px;
+        }
+
+        .target-text span.correct {
+            color: #2ecc71 !important;
+        }
+
+        .target-text span.wrong {
+            color: #e74c3c !important;
+            text-decoration: line-through;
+            text-decoration-thickness: 2px;
+        }
+
+        .progress-indicator {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .progress-bar-container {
+            width: 90%;
+            max-width: 1000px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        nav {
+            flex-shrink: 0;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -88,143 +160,239 @@ body {
         <a href="/">Home</a>
         <a href="/dashboard">Dashboard</a>
         <a href="/courses/python">Courses</a>
-        <div id="auth-section">
-            </div>
+        <div id="auth-section"></div>
     </div>
 </nav>
+
 <div class="lesson-container">
     <h2>Lesson {{ lesson.id }}: {{ lesson.title }}</h2>
     <p style="color: var(--text-dim); margin-bottom: 10px;">{{ lesson.instr }}</p>
 
     <div class="editor-container">
-        <div class="editor-header" style="background: #161b22; padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center;">
+        <div class="editor-header" style="background: #161b22; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center;">
             <div style="display: flex; gap: 8px; margin-right: 20px;">
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f56;"></div>
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e;"></div>
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: #27c93f;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #27c93f;"></div>
             </div>
-            <span style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #8b949e;">{{ lang }}_module_{{ lesson.id }}.py</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8b949e;">{{ lang }}_module_{{ lesson.id }}.py</span>
         </div>
         
-       <div class="editor-body">
-    <div class="target-text" id="display-text">
-        {% for char in lesson.target %}
-            <span>{{ char }}</span>
-        {% endfor %}
+        <div class="editor-body" id="editor-body">
+            <div class="target-text" id="display-text">
+                {% for char in lesson.target %}
+                    <span>{{ char }}</span>
+                {% endfor %}
+            </div>
+            <input type="text" id="type-input" autofocus autocomplete="off" spellcheck="false">
+        </div>
     </div>
-    <input type="text" id="type-input" autofocus autocomplete="off">
-</div>
+    
+    <div class="progress-indicator">
+        <span id="progress-text">0% complete</span>
     </div>
-
-  
+    <div class="progress-bar-container">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
 </div>
-
-
 
 <script>
     const input = document.getElementById('type-input');
     const displaySpans = document.querySelectorAll('#display-text span');
+    const editorBody = document.getElementById('editor-body');
     
     const target = "{{ lesson.target }}";
-    let timerStarted = false;
-    let mistakesCount = 0;
-    let totalKeystrokes = 0;  // Track ALL typing attempts
+    let startTime = null;
     let completed = false;
-    let correctChars = 0;  // Track number of correct characters
-
-    input.addEventListener('keydown', function(e) {
-        if (completed) return;
-        
-        const ignoredKeys = ['Backspace', 'Shift', 'Control', 'Alt', 'CapsLock', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Delete', 'Escape'];
-        if (ignoredKeys.includes(e.key)) return;
-
-        const currentIndex = input.value.length;
-        if (currentIndex < target.length) {
-            totalKeystrokes++;
-            if (e.key !== target[currentIndex]) {
-                mistakesCount++;
-            } else {
-                correctChars++;
+    let redirecting = false;
+    
+    // Stats tracking
+    let totalKeystrokes = 0;
+    let correctKeystrokes = 0;
+    let mistakesCount = 0;
+    
+    // Store the expected sequence
+    const expectedChars = target.split('');
+    
+    function updateProgress() {
+        const typed = input.value.length;
+        const progress = (typed / target.length) * 100;
+        document.getElementById('progress-fill').style.width = progress + '%';
+        document.getElementById('progress-text').textContent = Math.round(progress) + '% complete';
+    }
+    
+    function scrollToCurrent() {
+        const currentSpan = document.querySelector('.target-text span.current');
+        if (currentSpan && editorBody) {
+            const spanRect = currentSpan.getBoundingClientRect();
+            const containerRect = editorBody.getBoundingClientRect();
+            
+            if (spanRect.right > containerRect.right) {
+                editorBody.scrollLeft += spanRect.right - containerRect.right + 20;
+            } else if (spanRect.left < containerRect.left) {
+                editorBody.scrollLeft -= containerRect.left - spanRect.left + 20;
             }
         }
-        if (!timerStarted) {
-    timerStarted = true;
-    startTime = new Date();
-}
-    });
-
+    }
+    
     function updateHighlighting() {
-    const userValue = input.value;
-    const userChars = userValue.split('');
+        const typedValue = input.value;
+        const typedChars = typedValue.split('');
+        
+        displaySpans.forEach((span, index) => {
+            span.classList.remove('current', 'correct', 'wrong');
+            
+            if (index < typedChars.length) {
+                // This character has been typed
+                if (typedChars[index] === expectedChars[index]) {
+                    span.classList.add('correct');
+                } else {
+                    span.classList.add('wrong');
+                }
+            } else if (index === typedChars.length) {
+                // This is the next character to type
+                span.classList.add('current');
+            }
+        });
+        
+        updateProgress();
+        scrollToCurrent();
+    }
     
-    displaySpans.forEach((span, i) => {
-        const expectedChar = span.innerText;
-        const userChar = userChars[i];
+    function handleKeyPress(e) {
+        if (completed || redirecting) return;
         
-        // Reset classes
-        span.classList.remove('current');
+        const currentIndex = input.value.length;
         
-        if (!userChar) {
-            span.style.color = "#334155"; // Untyped
-            if (i === userValue.length) span.classList.add('current'); // Highlight next char
-        } else if (userChar === expectedChar) {
-            span.style.color = "#2ecc71"; // Correct (Green)
-            span.style.textShadow = "0 0 10px rgba(46, 204, 113, 0.5)";
+        // Start timer on first keystroke
+        if (currentIndex === 0 && !startTime) {
+            startTime = new Date();
+            console.log("Timer started");
+        }
+        
+        // Only process if we haven't completed the lesson
+        if (currentIndex < target.length) {
+            const expectedChar = expectedChars[currentIndex];
+            const pressedKey = e.key;
+            
+            // Count this keystroke
+            totalKeystrokes++;
+            
+            // Check if correct
+            if (pressedKey === expectedChar) {
+                correctKeystrokes++;
+                console.log(`Correct! Key: ${pressedKey}, Expected: ${expectedChar}`);
+            } else {
+                mistakesCount++;
+                console.log(`Wrong! Key: ${pressedKey}, Expected: ${expectedChar}`);
+            }
+            
+            console.log(`Stats - Total: ${totalKeystrokes}, Correct: ${correctKeystrokes}, Mistakes: ${mistakesCount}`);
+        }
+    }
+    
+    async function completeLesson() {
+        if (completed || redirecting) return;
+        
+        completed = true;
+        redirecting = true;
+        
+        const endTime = new Date();
+        const duration = startTime ? (endTime - startTime) : 1000;
+        const timeInMinutes = duration / 60000;
+        
+        // Calculate WPM: (correct characters / 5) / minutes
+        let wpm = 0;
+        if (timeInMinutes > 0 && correctKeystrokes > 0) {
+            wpm = Math.round((correctKeystrokes / 5) / timeInMinutes);
+        }
+        
+        // Calculate accuracy: (correct keystrokes / total keystrokes) * 100
+        let accuracy = 0;
+        if (totalKeystrokes > 0) {
+            accuracy = Math.round((correctKeystrokes / totalKeystrokes) * 100);
         } else {
-            span.style.color = "#e74c3c"; // Wrong (Red)
+            accuracy = 100;
         }
-    });
-}
-   async function completeLesson() {
-    const endTime = new Date();
-    // Ensure startTime exists; default to 1 second if not to avoid division by zero
-    const duration = startTime ? (endTime - startTime) : 1000;
-    const timeInMinutes = duration / 60000;
-    
-    // Standard WPM: (Characters / 5) / Time in minutes
-    const wpm = Math.round((target.length / 5) / timeInMinutes) || 0;
-
-    const finalAccuracy = totalKeystrokes > 0 
-        ? Math.round(((totalKeystrokes - mistakesCount) / totalKeystrokes) * 100) 
-        : 0;
-
-    await fetch('/process_stats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            lang: "{{ lang }}",
-            lesson_id: {{ lesson.id }},
-            accuracy: finalAccuracy,
-            wpm: wpm,
-            mistakes: mistakesCount,
-            total_chars: totalKeystrokes
-        })
-    });
-    window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
-}
-
-    input.addEventListener('input', function() {
-        if (completed) return;
         
-        if (!timerStarted && input.value.length === 1) {
-            timerStarted = true;
+        console.log("=== LESSON COMPLETE ===");
+        console.log(`Target length: ${target.length}`);
+        console.log(`Total keystrokes: ${totalKeystrokes}`);
+        console.log(`Correct keystrokes: ${correctKeystrokes}`);
+        console.log(`Mistakes: ${mistakesCount}`);
+        console.log(`Accuracy: ${accuracy}%`);
+        console.log(`WPM: ${wpm}`);
+        console.log(`Duration: ${duration}ms`);
+        
+        input.disabled = true;
+        
+        try {
+            const response = await fetch('/process_stats', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    lang: "{{ lang }}",
+                    lesson_id: {{ lesson.id }},
+                    accuracy: accuracy,
+                    wpm: wpm,
+                    mistakes: mistakesCount,
+                    total_chars: totalKeystrokes
+                })
+            });
+            
+            const result = await response.json();
+            console.log("Stats saved:", result);
+            
+            window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
+        } catch (error) {
+            console.error('Error saving stats:', error);
+            window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
         }
+    }
+    
+    // Main input event handler
+    input.addEventListener('input', function(e) {
+        if (completed || redirecting) return;
         
         updateHighlighting();
         
+        // Check if lesson is complete
         if (input.value.length >= target.length) {
-            completeLesson();
+            console.log("Lesson complete! Redirecting...");
+            setTimeout(() => {
+                completeLesson();
+            }, 100);
         }
     });
-
+    
+    // Track keystrokes using keydown (captures the key before input event)
+    input.addEventListener('keydown', function(e) {
+        if (completed || redirecting) return;
+        
+        // Ignore control keys
+        const ignoredKeys = ['Shift', 'Control', 'Alt', 'CapsLock', 'Tab', 
+                            'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 
+                            'Home', 'End', 'Delete', 'Escape', 'Backspace'];
+        
+        if (!ignoredKeys.includes(e.key)) {
+            handleKeyPress(e);
+        }
+    });
+    
+    // Reset and focus on load
     window.addEventListener('load', function() {
         input.value = '';
-        mistakesCount = 0;
         totalKeystrokes = 0;
-        correctChars = 0;
+        correctKeystrokes = 0;
+        mistakesCount = 0;
         completed = false;
+        redirecting = false;
+        startTime = null;
+        input.disabled = false;
         input.focus();
-        updateHighlighting(); 
+        updateHighlighting();
+        console.log("Lesson loaded. Target:", target);
+        console.log("Expected chars:", expectedChars);
     });
 </script>
 </body>
