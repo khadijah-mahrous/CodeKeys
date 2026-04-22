@@ -2,104 +2,111 @@
 <html>
 <head>
     <title>CodeKeys - Dashboard</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<style>
-  body {
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
-}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
+        }
 
-.dashboard-wrapper {
-    display: flex;
-    width: 100%;
-    height: 100vh;
-}
+        .dashboard-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
 
-/* --- SLEEK SIDEBAR --- */
-.sidebar {
-    width: 260px;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(20px);
-    border-right: 1px solid var(--border-glass);
-    display: flex;
-    flex-direction: column;
-    padding: 30px 20px;
-}
+        .sidebar {
+            width: 260px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-glass);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+        }
 
-.nav-item {
-    color: var(--text-dim);
-    padding: 12px 15px;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    transition: 0.3s;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
+        .nav-item {
+            color: var(--text-dim);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: 0.3s;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
 
-.nav-item:hover, .nav-item.active {
-    background: rgba(139, 92, 246, 0.1);
-    color: var(--accent-primary);
-    transform: translateX(5px);
-}
+        .nav-item:hover, .nav-item.active {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-primary);
+            transform: translateX(5px);
+        }
 
-/* --- CONTENT AREA --- */
-.dashboard-content {
-    flex: 1;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-}
+        .dashboard-content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
 
-.header-card, .stat-box, .ai-section {
-    background: var(--bg-glass) !important;
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border-glass) !important;
-    border-radius: 20px;
-    padding: 25px;
-}
+        .header-card, .stat-box, .ai-section {
+            background: var(--bg-glass) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 20px;
+            padding: 25px;
+        }
 
-.header-card h1 { color: var(--text-bright); margin: 0; }
-.header-card p { color: var(--text-dim); }
+        .header-card h1 { color: var(--text-bright); margin: 0; }
+        .header-card p { color: var(--text-dim); }
 
-.ai-section {
-    background: rgba(0, 0, 0, 0.3) !important;
-    border-left: 4px solid var(--accent-primary) !important;
-}
+        .ai-section {
+            background: rgba(0, 0, 0, 0.3) !important;
+            border-left: 4px solid var(--accent-primary) !important;
+        }
 
-/* Progress Bar Color */
-.progress-bar {
-    height: 8px;
-    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-    border-radius: 4px;
-    transition: width 1s ease-in-out;
-}
-.sidebar .logout-btn {
-    display: inline-flex; /* Prevents it from taking full width */
-    margin: 0 auto;       /* Centers it if needed */
-    text-align: center;
-}
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+        }
 
-.sidebar .nav-item {
-    margin: 2px 0;        /* Tighter spacing to avoid scrolling */
-    padding: 10px 15px;
-}
-</style>
+        .sidebar .logout-btn {
+            display: inline-flex;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .sidebar .nav-item {
+            margin: 2px 0;
+            padding: 10px 15px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .btn-main {
+            display: inline-block;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 
-{% if success_msg %}
-<div class="success-message" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
-    {{ success_msg }}
-</div>
-{% endif %}
-
 <div class="dashboard-wrapper">
     <div class="sidebar">
-        <h2 style="color: #2980b9; margin-bottom: 30px;">⌨️ CodeKeys</h2>
+        <h2 style="color: #8b5cf6; margin-bottom: 30px;">⌨️ CodeKeys</h2>
         <a href="/" style="text-decoration: none;"><div class="nav-item">🏠 HOME</div></a>
         <div class="nav-item active">📊 DASHBOARD</div>
         <a href="/courses/python" style="text-decoration: none;"><div class="nav-item">📚 COURSES</div></a>
@@ -107,15 +114,15 @@
         <div class="nav-item">🏆 ACHIEVEMENTS</div>
         <div class="nav-item">⚙️ SETTINGS</div>
         
-       <div style="margin-top: auto; padding: 0 10px;">
-    <a href="/logout" class="logout-btn" style="width: auto; padding: 8px 20px; font-size: 0.75rem;">Logout</a>
-</div>
+        <div style="margin-top: auto; padding: 0 10px;">
+            <a href="/logout" class="logout-btn" style="width: auto; padding: 8px 20px; font-size: 0.75rem;">Logout</a>
+        </div>
     </div>
 
     <div class="dashboard-content">
-        <div class="header-card" style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-            <h1 style="margin:0; color:#2c3e50;">👋 Welcome, {{ data.username }}!</h1>
-            <p style="color:#7f8c8d; margin-top: 10px;">Level <span id="current-level">{{ data.level }}</span> Typist | 🔥 7 Day Streak</p>
+        <div class="header-card">
+            <h1 style="margin:0;">👋 Welcome, {{ data.username }}!</h1>
+            <p style="margin-top: 10px;">Level <span id="current-level">{{ data.level }}</span> Typist | 🔥 7 Day Streak</p>
             
             <div class="level-progress">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
@@ -129,28 +136,41 @@
         <div class="stats-container">
     <div class="stat-box">
         <div style="font-size: 12px; color: #999; margin-bottom: 10px;">🎯 BEST ACCURACY</div>
-        <div style="font-size: 36px; font-weight: bold; color: #2c3e50;">{{ data.accuracy }}%</div>
+        <div style="font-size: 36px; font-weight: bold; color: #8b5cf6;">{{ data.accuracy }}%</div>
         <p style="font-size: 11px; color: #7f8c8d;">Target: 70% to unlock new levels</p>
     </div>
-    </div>
+</div>
 
-   <div class="ai-section" style="background: #010409; border: 1px solid var(--border); padding: 30px; border-radius: 12px;">
-    <h3 style="color: var(--accent); font-family: 'JetBrains Mono'; margin-top: 0;">> AI_COACH_DIAGNOSTIC</h3>
-    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.8;">
-        {% if data.problem_keys and data.problem_keys|length > 0 %}
-            <p style="color: var(--text-secondary)">[STATUS] Analysis complete. Latency issues detected.</p>
-            <p style="color: var(--error)">[ERROR] Critical friction on keys: {{ data.problem_keys|join(', ') }}</p>
-            <p style="color: var(--accent)">[ADVICE] Focus on finger placement for these coordinates.</p>
-        {% else %}
-            <p style="color: var(--success)">[STATUS] System optimal. No syntax friction detected.</p>
-            <p style="color: var(--text-secondary)">[ADVICE] Increase complexity to further optimize speed.</p>
-        {% endif %}
-    </div>
-</div>
+<div style="margin: 20px 0;">
+    <h3>📚 Course Progress</h3>
+    <div style="display: grid; gap: 15px;">
+        {% for lang_key, lang_info in languages.items() %}
+        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span>{{ lang_info.icon }} {{ lang_info.name }}</span>
+                <span>Level {{ data.get(lang_key + '_level', 1) }}</span>
+            </div>
+            <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                <div style="width: {{ ((data.get(lang_key + '_level', 1) - 
+
+        <div class="ai-section">
+            <h3 style="color: var(--accent-primary); font-family: 'JetBrains Mono'; margin-top: 0;">> AI_COACH_DIAGNOSTIC</h3>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.8;">
+                {% if data.problem_keys and data.problem_keys|length > 0 %}
+                    <p style="color: var(--text-dim)">[STATUS] Analysis complete. Latency issues detected.</p>
+                    <p style="color: #e74c3c">[ERROR] Critical friction on keys: {{ data.problem_keys|join(', ') }}</p>
+                    <p style="color: var(--accent-primary)">[ADVICE] Focus on finger placement for these coordinates.</p>
+                {% else %}
+                    <p style="color: #2ecc71">[STATUS] System optimal. No syntax friction detected.</p>
+                    <p style="color: var(--text-dim)">[ADVICE] Increase complexity to further optimize speed.</p>
+                {% endif %}
+            </div>
+        </div>
         
-     <div style="margin-top: auto; text-align: center;">
-    <a href="/lesson/python/{{ data.level|default(1) }}" class="btn-main">Continue Learning →</a>
-</div>
+        <div style="margin-top: auto; text-align: center;">
+            <a href="/lesson/python/{{ data.level|default(1) }}" class="btn-main">Continue Learning →</a>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -164,11 +184,6 @@
     document.getElementById('next-level').innerHTML = currentLevel + 1;
     document.getElementById('progress-percent').innerHTML = progress + '%';
     document.getElementById('progress-bar').style.width = progress + '%';
-    
-    setTimeout(function() {
-        var msg = document.querySelector('.success-message');
-        if (msg) msg.style.display = 'none';
-    }, 3000);
 </script>
 </body>
 </html>
