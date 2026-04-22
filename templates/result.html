@@ -20,108 +20,139 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-bottom: 20px;
+            padding: 20px;
         }
 
-        /* Narrow and Sleek Panel */
+        /* Glass Panel */
         .result-glass-panel {
             width: 90%;
-            max-width: 750px;
-            padding: 30px;
-            display: flex;
-            gap: 40px;
+            max-width: 800px;
+            padding: 40px;
             background: rgba(255, 255, 255, 0.03) !important;
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            align-items: center;
+            text-align: center;
         }
 
-        /* Compact Circular Score */
-        .score-circle-big {
-            width: 150px; 
-            height: 150px;
-            border: 4px solid var(--accent-primary);
+        /* Status Header */
+        .status-header {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .status-pass {
+            color: #2ecc71;
+        }
+
+        .status-fail {
+            color: #e74c3c;
+        }
+
+        /* Big Score Circle */
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 30px;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 25px rgba(139, 92, 246, 0.3);
-            flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
+            border: 3px solid var(--accent-primary);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
         }
 
-        .score-circle-big span { 
-            font-size: 2.5rem; 
+        .score-percent {
+            font-size: 3rem;
             font-weight: 800;
             color: white;
         }
 
-        /* Content Area */
-        .mission-info {
-            flex: 1;
-        }
-
-        .mission-status-header {
+        .score-label {
             font-size: 0.7rem;
+            color: var(--text-dim);
             letter-spacing: 2px;
-            font-weight: bold;
-            color: var(--accent-secondary);
-            margin-bottom: 8px;
         }
 
-        .mission-info h1 {
-            font-size: 1.8rem;
-            margin: 0;
-            color: white;
-            line-height: 1.2;
+        /* Stars Display */
+        .stars-display {
+            margin: 20px 0;
         }
 
-        /* Compact Stats Grid */
+        .stars {
+            display: inline-flex;
+            gap: 8px;
+            font-size: 2rem;
+        }
+
+        .star-filled {
+            color: #fbbf24;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+
+        .star-empty {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .star-message {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 20px 0;
+            gap: 15px;
+            margin: 30px 0;
         }
 
         .stat-box {
             background: rgba(255, 255, 255, 0.05);
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .stat-label {
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             color: var(--text-dim);
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .stat-value {
-            font-size: 1rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: white;
+        }
+
+        .stat-unit {
+            font-size: 0.7rem;
+            color: var(--text-dim);
         }
 
         /* Action Buttons */
         .action-area {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
 
         .btn-action {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px 24px;
+            border-radius: 10px;
             text-decoration: none;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: bold;
-            text-align: center;
             text-transform: uppercase;
             transition: 0.3s;
         }
@@ -131,15 +162,31 @@
             color: white;
         }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.08);
+        .btn-retry {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-dashboard {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .btn-action:hover {
             transform: translateY(-2px);
-            filter: brightness(1.2);
+            filter: brightness(1.1);
+        }
+
+        .lesson-title {
+            font-size: 1.2rem;
+            color: var(--text-bright);
+            margin-bottom: 10px;
+        }
+
+        hr {
+            border-color: rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
         }
     </style>
 </head>
@@ -157,44 +204,80 @@
 <div class="result-full-container">
     <div class="result-glass-panel">
         
-        <div class="score-circle-big">
-            <span>{{ accuracy }}%</span>
-            <div style="font-size: 0.6rem; color: var(--accent-secondary); letter-spacing: 1px;">ACCURACY</div>
+        <!-- Status Header -->
+        <div class="status-header">
+            {% if passed %}
+            <span class="status-pass">✓ MISSION COMPLETE</span>
+            {% else %}
+            <span class="status-fail">⚠ MISSION FAILED</span>
+            {% endif %}
         </div>
 
-        <div class="mission-info">
-            <div class="mission-status-header">
-                {% if accuracy >= 70 %}✨ MISSION_SUCCESS{% else %}🛠️ EVALUATION_FAILED{% endif %}
-            </div>
+        <!-- Lesson Title -->
+        <div class="lesson-title">
+            {{ lesson_title }}
+        </div>
 
-            <h1>Module {{ lesson_id }} Complete</h1>
-            
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-label">Chars</div>
-                    <div class="stat-value">{{ total_chars }}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Errors</div>
-                    <div class="stat-value" style="color: #ff5f56;">{{ mistakes }}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Speed</div>
-                    <div class="stat-value" style="color: var(--accent-secondary);">{{ session.get('last_results', {}).get('wpm', 0) }} WPM</div>
-                </div>
-            </div>
+        <!-- Score Circle -->
+        <div class="score-circle">
+            <div class="score-percent">{{ accuracy }}%</div>
+            <div class="score-label">ACCURACY</div>
+        </div>
 
-            <div class="action-area">
-                {% if accuracy >= 70 %}
-                <a href="/lesson/{{ lang }}/{{ lesson_id + 1 }}" class="btn-action btn-next">Next Module →</a>
-                {% endif %}
-                <a href="/lesson/{{ lang }}/{{ lesson_id }}" class="btn-action btn-secondary">Retry</a>
-                <a href="/dashboard" class="btn-action btn-secondary">Exit</a>
+        <!-- Stars Display -->
+        <div class="stars-display">
+            <div class="stars">
+                {% for i in range(1, 6) %}
+                    {% if i <= stars %}
+                        <span class="star-filled">★</span>
+                    {% else %}
+                        <span class="star-empty">☆</span>
+                    {% endif %}
+                {% endfor %}
             </div>
+            <div class="star-message">{{ star_message }}</div>
+        </div>
+
+        <hr>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-label">Characters Typed</div>
+                <div class="stat-value">{{ total_chars }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Mistakes</div>
+                <div class="stat-value" style="color: #ff5f56;">{{ mistakes }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Speed</div>
+                <div class="stat-value">{{ wpm }} <span class="stat-unit">WPM</span></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-area">
+            {% if passed %}
+                {% set next_lesson = lesson_id + 1 %}
+                <a href="/lesson/{{ lang }}/{{ next_lesson }}" class="btn-action btn-next">Next Lesson →</a>
+            {% endif %}
+            <a href="/lesson/{{ lang }}/{{ lesson_id }}" class="btn-action btn-retry">Try Again ↻</a>
+            <a href="/courses/{{ lang }}" class="btn-action btn-dashboard">Back to Course</a>
         </div>
 
     </div>
 </div>
 
+<script>
+    // Debug - log the results
+    console.log("Results page loaded with:", {
+        accuracy: {{ accuracy }},
+        mistakes: {{ mistakes }},
+        total_chars: {{ total_chars }},
+        wpm: {{ wpm }},
+        stars: {{ stars }}
+    });
+</script>
 </body>
 </html>
