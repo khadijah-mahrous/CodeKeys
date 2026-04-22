@@ -5,54 +5,54 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
-    height: 100vh;
-    overflow: hidden; /* This kills the scrollbar */
-    display: flex;
-    flex-direction: column;
-}
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-.hero {
-    flex: 0 1 auto; /* Take only needed space */
-    padding: 20px 10% !important;
-    text-align: center;
-    background: transparent !important;
-}
+        .hero {
+            flex: 0 1 auto;
+            padding: 20px 10% !important;
+            text-align: center;
+            background: transparent !important;
+        }
 
-.hero h1 { font-size: 2.2rem; margin: 0; }
-.hero p { font-size: 1rem; margin: 10px 0; }
+        .hero h1 { font-size: 2.2rem; margin: 0; }
+        .hero p { font-size: 1rem; margin: 10px 0; }
 
-.card-section {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Forces 3 equal columns */
-    gap: 20px;
-    padding: 40px 10%;
-    max-width: 1200px;
-    margin: 0 auto;
-    align-items: stretch; /* This ensures all cards in the row take the same height */
-}
+        .card-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 40px 10%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: stretch;
+        }
 
-.card {
-    background: var(--bg-glass);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border-glass);
-    border-radius: 20px;
-    padding: 30px !important;
-    display: flex;
-    flex-direction: column; /* Stack content vertically */
-    text-align: center;
-    transition: all 0.3s ease;
-}
+        .card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 30px !important;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
 
-/* This pushes the button to the very bottom of the card */
-.card .course-btn {
-    margin-top: auto; 
-}
+        .card .course-btn {
+            margin-top: auto; 
+        }
 
-.card img {
-    width: 50px;
-    height: 50px;
-    margin: 0 auto;
-}
+        .card img {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+        }
+
         #authModal {
             display: none;
             position: fixed;
@@ -65,8 +65,9 @@
             justify-content: center;
             align-items: center;
         }
+
         #authModal .modal-content {
-            background: white;
+            background: #1a1a2e;
             padding: 40px;
             border-radius: 15px;
             width: 400px;
@@ -74,70 +75,68 @@
             position: relative;
             animation: modalSlideIn 0.3s ease;
         }
+
         @keyframes modalSlideIn {
             from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        .tab-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            color: #999;
-            transition: 0.3s;
-        }
-        .tab-btn.active {
-            color: #2980b9;
-            border-bottom: 2px solid #2980b9;
-            margin-bottom: -2px;
-        }
+
         .auth-form {
             display: none;
         }
+
         .auth-form.active {
             display: block;
         }
+
         .auth-form input {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
-            border: 2px solid #ddd;
+            border: 2px solid #333;
             border-radius: 8px;
             font-size: 14px;
             box-sizing: border-box;
+            background: rgba(255,255,255,0.1);
+            color: white;
         }
+
         .auth-form input:focus {
-            border-color: #2980b9;
+            border-color: #8b5cf6;
             outline: none;
         }
+
+        .auth-form input::placeholder {
+            color: #888;
+        }
+
         .auth-form button {
             width: 100%;
             margin-top: 15px;
         }
+
         .close-modal-btn {
-            background: none;
-            border: none;
-            color: #bbb;
+            background: none !important;
+            border: none !important;
+            color: #bbb !important;
             margin-top: 15px;
             cursor: pointer;
             font-size: 14px;
+            box-shadow: none !important;
         }
-        .close-modal-btn:hover { color: #e74c3c; }
+
+        .close-modal-btn:hover {
+            color: #e74c3c !important;
+            transform: none !important;
+        }
+
         .error-message {
             color: #e74c3c;
             font-size: 12px;
             margin-top: 5px;
             display: none;
         }
+
         .user-info {
             color: white;
             margin-left: 25px;
@@ -145,9 +144,10 @@
             align-items: center;
             gap: 10px;
         }
+
         .logout-btn {
-            background: #e74c3c;
-            padding: 5px 12px;
+            background: #e74c3c !important;
+            padding: 5px 12px !important;
             border-radius: 4px;
             color: white !important;
             text-decoration: none;
@@ -156,13 +156,16 @@
             align-items: center;
             gap: 5px;
         }
+
         .logout-btn:hover {
-            background: #c0392b;
+            background: #c0392b !important;
         }
+
         .welcome-text {
             font-size: 14px;
-            color: #2980b9;
+            color: #8b5cf6;
         }
+
         .success-message {
             position: fixed;
             top: 20px;
@@ -175,11 +178,57 @@
             animation: slideIn 0.3s ease;
             display: none;
         }
+
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
 
+        #auth-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .switch-auth-link {
+            margin-top: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .switch-auth-link a {
+            color: #8b5cf6;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .switch-auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) !important;
+            color: white !important;
+            padding: 8px 20px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 0.8rem !important;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Only show Continue Learning button when logged in */
+        .continue-btn {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -192,66 +241,85 @@
         <a href="/dashboard">Dashboard</a>
         <a href="/courses/python">Courses</a>
         <div id="auth-section">
-            </div>
+            <a href="javascript:void(0)" onclick="openModal()" class="nav-btn">Login / Sign Up</a>
+        </div>
     </div>
 </nav>
 
 <div id="authModal">
     <div class="modal-content">
-        <h2 style="color:#2c3e50; margin-bottom:10px;">Welcome to CodeKeys</h2>
+        <h2 style="color:#8b5cf6; margin-bottom:10px;" id="modal-title">Welcome Back</h2>
         
-        <div class="tab-buttons">
-            <button class="tab-btn active" onclick="switchTab('login')">Login</button>
-            <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
-        </div>
-        
+        <!-- Login Form -->
         <div id="login-form" class="auth-form active">
             <input type="email" id="login-email" placeholder="Email" required>
             <input type="password" id="login-password" placeholder="Password" required>
             <div id="login-error" class="error-message"></div>
             <button onclick="login()" class="btn-main">Login →</button>
+            <div class="switch-auth-link">
+                Don't have an account? <a onclick="switchToSignup()">Sign Up</a>
+            </div>
         </div>
         
+        <!-- Signup Form -->
         <div id="signup-form" class="auth-form">
             <input type="text" id="signup-name" placeholder="Full Name" required>
             <input type="email" id="signup-email" placeholder="Email" required>
             <input type="password" id="signup-password" placeholder="Password" required>
             <div id="signup-error" class="error-message"></div>
             <button onclick="signup()" class="btn-main">Create Account →</button>
+            <div class="switch-auth-link">
+                Already have an account? <a onclick="switchToLogin()">Login</a>
+            </div>
         </div>
         
         <button onclick="closeModal()" class="close-modal-btn">Close</button>
     </div>
 </div>
 
-
-
 <div class="hero">
     <h1>Learn to Type. Learn to Code.</h1>
     <p>Master typing while actually learning Python, JavaScript, and Java with a personal AI coach.</p>
-<a href="/resume" class="btn-main" id="start-btn">Continue Learning</a>
+    <!-- Continue Learning button - only for Basics, only shown when logged in -->
+    <div id="continue-learning-container" style="display: none;">
+        <a href="javascript:void(0)" class="btn-main continue-btn" id="continue-btn">Continue Learning Basics →</a>
+    </div>
+    <!-- Show Start button when not logged in -->
+    <a href="/courses/basics" class="btn-main" id="start-btn">Start with Basics →</a>
+</div>
+
 <div class="card-section">
+    <!-- Python Card -->
     <div class="card">
-        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968350.png" width="60" alt="Python">
-        <h3>Python 🐍</h3>
-        <p style="font-size: 12px; color: #666; margin: 10px 0;">Learn Python syntax while typing</p>
-        <a href="/intro/python" class="btn-small course-btn">View Course →</a>
+        <div style="font-size: 48px; margin-bottom: 10px;">🐍</div>
+        <h3>Python Programming</h3>
+        <p style="font-size: 12px; color: #a1a1aa; margin: 10px 0;">Learn Python syntax while building typing speed. Perfect for beginners!</p>
+        <button onclick="handleCourseStart('python')" class="btn-small course-btn" id="python-btn">
+            Start Course →
+        </button>
     </div>
+
+    <!-- JavaScript Card -->
     <div class="card">
-        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968292.png" width="60" alt="JavaScript">
-        <h3>JavaScript ⚡</h3>
-        <p style="font-size: 12px; color: #666; margin: 10px 0;">Master JS fundamentals</p>
-        <a href="/intro/javascript" class="btn-small course-btn">View Course →</a>
+        <div style="font-size: 48px; margin-bottom: 10px;">⚡</div>
+        <h3>JavaScript</h3>
+        <p style="font-size: 12px; color: #a1a1aa; margin: 10px 0;">Master JavaScript fundamentals and modern ES6+ syntax through typing practice.</p>
+        <button onclick="handleCourseStart('javascript')" class="btn-small course-btn" id="javascript-btn">
+            Start Course →
+        </button>
     </div>
+
+    <!-- Java Card -->
     <div class="card">
-        <img src="https://cdn-icons-png.flaticon.com/512/226/226777.png" width="60" alt="Java">
-        <h3>Java ☕</h3>
-        <p style="font-size: 12px; color: #666; margin: 10px 0;">Build strong Java skills</p>
-        <a href="/intro/java" class="btn-small course-btn">View Course →</a>
+        <div style="font-size: 48px; margin-bottom: 10px;">☕</div>
+        <h3>Java</h3>
+        <p style="font-size: 12px; color: #a1a1aa; margin: 10px 0;">Build strong Java programming skills with hands-on typing exercises.</p>
+        <button onclick="handleCourseStart('java')" class="btn-small course-btn" id="java-btn">
+            Start Course →
+        </button>
     </div>
 </div>
 
-</div>
 <script>
     let pendingUrl = null;
     
@@ -271,20 +339,9 @@
         openModal();
     } else if (urlParams.get('login_required') === 'lesson') {
         pendingUrl = sessionStorage.getItem('pendingLessonUrl');
-        openModal();
-    }
-    
-    function checkAndGoToDashboard() {
-        fetch('/check_auth')
-            .then(res => res.json())
-            .then(data => {
-                if (data.logged_in) {
-                    window.location.href = '/dashboard';
-                } else {
-                    pendingUrl = '/dashboard';
-                    openModal();
-                }
-            });
+        if (pendingUrl) {
+            openModal();
+        }
     }
     
     function showToast(message, isError = false) {
@@ -297,23 +354,18 @@
         }, 3000);
     }
     
-    function switchTab(tab) {
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-        const tabs = document.querySelectorAll('.tab-btn');
-        
-        if (tab === 'login') {
-            loginForm.classList.add('active');
-            signupForm.classList.remove('active');
-            tabs[0].classList.add('active');
-            tabs[1].classList.remove('active');
-        } else {
-            loginForm.classList.remove('active');
-            signupForm.classList.add('active');
-            tabs[0].classList.remove('active');
-            tabs[1].classList.add('active');
-        }
-        
+    function switchToSignup() {
+        document.getElementById('login-form').classList.remove('active');
+        document.getElementById('signup-form').classList.add('active');
+        document.getElementById('modal-title').textContent = 'Create Account';
+        document.getElementById('login-error').style.display = 'none';
+        document.getElementById('signup-error').style.display = 'none';
+    }
+    
+    function switchToLogin() {
+        document.getElementById('signup-form').classList.remove('active');
+        document.getElementById('login-form').classList.add('active');
+        document.getElementById('modal-title').textContent = 'Welcome Back';
         document.getElementById('login-error').style.display = 'none';
         document.getElementById('signup-error').style.display = 'none';
     }
@@ -346,7 +398,7 @@
                     pendingUrl = null;
                     window.location.href = url;
                 } else {
-                    window.location.href = '/';
+                    location.reload();
                 }
             } else {
                 errorDiv.textContent = data.message;
@@ -388,7 +440,7 @@
                     pendingUrl = null;
                     window.location.href = url;
                 } else {
-                    window.location.href = '/';
+                    location.reload();
                 }
             } else {
                 errorDiv.textContent = data.message;
@@ -401,10 +453,62 @@
         });
     }
     
-    function updateUIForLoggedInUser(name) {
+   // New function to handle course starting with progress tracking
+function handleCourseStart(language) {
+    fetch('/check_auth')
+        .then(res => res.json())
+        .then(data => {
+            if (data.logged_in) {
+                // User is logged in, get their next lesson
+                fetch(`/get_next_lesson/${language}`)
+                    .then(res => res.json())
+                    .then(lessonData => {
+                        if (lessonData.next_lesson_id) {
+                            // Redirect to the lesson they stopped at
+                            window.location.href = `/lesson/${language}/${lessonData.next_lesson_id}`;
+                        } else {
+                            // Fallback to intro page
+                            window.location.href = `/intro/${language}`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        window.location.href = `/intro/${language}`;
+                    });
+            } else {
+                // User not logged in, store pending language and show login
+                pendingUrl = `/intro/${language}`;
+                openModal();
+            }
+        });
+}
+
+// Update the continue learning button for Basics
+function handleContinueBasics() {
+    fetch('/check_auth')
+        .then(res => res.json())
+        .then(data => {
+            if (data.logged_in) {
+                // Get next lesson for basics
+                fetch('/get_next_lesson/basics')
+                    .then(res => res.json())
+                    .then(lessonData => {
+                        if (lessonData.next_lesson_id) {
+                            window.location.href = `/lesson/basics/${lessonData.next_lesson_id}`;
+                        } else {
+                            window.location.href = '/courses/basics';
+                        }
+                    });
+            } else {
+                pendingUrl = '/courses/basics';
+                openModal();
+            }
+        });
+}
+
+// Update the updateUIForLoggedInUser function
+function updateUIForLoggedInUser(name) {
     const authSection = document.getElementById('auth-section');
-    
-    // REPLACE the old authSection.innerHTML with this new professional version:
     authSection.innerHTML = `
         <span class="user-info">
             <span class="welcome-text">👋 ${name}</span>
@@ -412,29 +516,71 @@
         </span>
     `;
     
-    // Keep the rest of the function logic for the "Start" button
+    // Hide the "Start with Basics" button and show "Continue Learning Basics" button
     const startBtn = document.getElementById('start-btn');
+    const continueContainer = document.getElementById('continue-learning-container');
+    const continueBtn = document.getElementById('continue-btn');
+    
     if (startBtn) {
-        startBtn.textContent = 'Continue Learning';
-        startBtn.href = '/courses/python';
+        startBtn.style.display = 'none';
     }
-}
-        
-        document.querySelectorAll('.course-btn').forEach(btn => {
-            btn.href = '/intro/python';
-            btn.textContent = 'View Course →';
+    if (continueContainer) {
+        continueContainer.style.display = 'block';
+    }
+    if (continueBtn) {
+        // Remove any existing event listeners and add new one
+        const newContinueBtn = continueBtn.cloneNode(true);
+        continueBtn.parentNode.replaceChild(newContinueBtn, continueBtn);
+        newContinueBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            handleContinueBasics();
         });
     }
     
+    // Update course buttons to show "Continue" instead of "Start" if they have progress
+    updateCourseButtons(name);
+}
+
+// New function to update course buttons based on user progress
+function updateCourseButtons(userName) {
+    fetch('/check_auth')
+        .then(res => res.json())
+        .then(data => {
+            if (data.logged_in) {
+                // Check progress for each language
+                const languages = ['python', 'javascript', 'java'];
+                languages.forEach(lang => {
+                    fetch(`/get_next_lesson/${lang}`)
+                        .then(res => res.json())
+                        .then(lessonData => {
+                            const btn = document.getElementById(`${lang}-btn`);
+                            if (btn && lessonData.next_lesson_id) {
+                                if (lessonData.next_lesson_id > 1) {
+                                    btn.textContent = `Continue → (Lesson ${lessonData.next_lesson_id})`;
+                                } else {
+                                    btn.textContent = `Start Course →`;
+                                }
+                            }
+                        });
+                });
+            }
+        });
+}
+
+// Update the continue button in hero section HTML
+// Make sure the continue button has an ID
+    
     function openModal() {
-        document.getElementById('authModal').style.display = 'flex';
+        // Reset to login form
+        switchToLogin();
+        
         document.getElementById('login-email').value = '';
         document.getElementById('login-password').value = '';
         document.getElementById('signup-name').value = '';
         document.getElementById('signup-email').value = '';
         document.getElementById('signup-password').value = '';
-        document.getElementById('login-error').style.display = 'none';
-        document.getElementById('signup-error').style.display = 'none';
+        
+        document.getElementById('authModal').style.display = 'flex';
     }
     
     function closeModal() {
@@ -446,6 +592,19 @@
         if (event.target === modal) {
             closeModal();
         }
+    }
+    
+    function checkAuthAndRedirect(url) {
+        fetch('/check_auth')
+            .then(res => res.json())
+            .then(data => {
+                if (data.logged_in) {
+                    window.location.href = url;
+                } else {
+                    pendingUrl = url;
+                    openModal();
+                }
+            });
     }
 </script>
 </body>
