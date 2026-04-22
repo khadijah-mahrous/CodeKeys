@@ -5,48 +5,184 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
-    height: 100vh;
-    overflow: hidden; /* Lock scroll */
-    display: flex;
-    flex-direction: column;
-    background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
-}
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
+        }
 
-.path-container {
-    flex: 1;
-    padding: 20px 10%;
-    text-align: center;
-    overflow-y: auto; /* Allow scrolling ONLY inside the lesson list if needed */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}       
+        .path-container {
+            flex: 1;
+            padding: 20px 10%;
+            text-align: center;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }       
 
-/* Glassmorphism Lesson Nodes */
-.lesson-node { 
-    background: var(--bg-glass) !important;
-    backdrop-filter: blur(10px);
-    padding: 15px 30px; 
-    border-radius: 16px; 
-    margin: 10px 0; 
-    width: 100%;
-    max-width: 600px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between;
-    border: 1px solid var(--border-glass) !important; 
-    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
+        /* Glassmorphism Lesson Nodes */
+        .lesson-node { 
+            background: var(--bg-glass) !important;
+            backdrop-filter: blur(10px);
+            padding: 15px 25px; 
+            border-radius: 16px; 
+            margin: 10px 0; 
+            width: 100%;
+            max-width: 750px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            border: 1px solid var(--border-glass) !important; 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
-.lesson-node:hover { 
-    transform: translateX(10px); 
-    border-color: var(--accent-primary) !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 0 20px var(--hover-glow);
-}
+        .lesson-node:hover { 
+            transform: translateX(10px); 
+            border-color: var(--accent-primary) !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 0 20px var(--hover-glow);
+        }
 
-.lesson-node div { color: var(--text-bright) !important; }
-.lesson-node div span { color: var(--text-dim) !important; }
+        .lesson-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .lesson-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .lesson-number {
+            color: var(--accent-secondary);
+            font-family: 'JetBrains Mono';
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .lesson-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-bright);
+        }
+
+        /* Star Rating System */
+        .stars-container {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stars {
+            display: inline-flex;
+            gap: 3px;
+            align-items: center;
+        }
+
+        .star {
+            font-size: 1.1rem;
+            cursor: default;
+        }
+
+        .star.filled {
+            color: #fbbf24;
+            text-shadow: 0 0 5px rgba(251, 191, 36, 0.5);
+        }
+
+        .star.empty {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .star.half {
+            color: #fbbf24;
+            position: relative;
+        }
+
+        .accuracy-badge {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        /* Button Styles */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) !important;
+            padding: 8px 20px !important;
+            font-size: 0.75rem !important;
+        }
+
+        .btn-retry {
+            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+            padding: 8px 16px !important;
+            font-size: 0.7rem !important;
+        }
+
+        .btn-retry:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226) !important;
+        }
+
+        .btn-locked {
+            background: #334155 !important;
+            padding: 8px 20px !important;
+            font-size: 0.75rem !important;
+            cursor: not-allowed;
+        }
+
+        .course-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-glass);
+            flex-wrap: wrap;
+        }
+
+        .course-nav .tab-btn {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim) !important;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .course-nav .tab-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--text-bright) !important;
+            border-color: var(--accent-primary);
+        }
+
+        .course-nav .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white !important;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Locked overlay */
+        .locked-overlay {
+            opacity: 0.6;
+            filter: grayscale(0.3);
+        }
     </style>
 </head>
 <body>
@@ -57,66 +193,119 @@
         <a href="/">Home</a>
         <a href="/dashboard">Dashboard</a>
         <a href="/courses/python">Courses</a>
-        <div id="auth-section">
-            </div>
+        <div id="auth-section"></div>
     </div>
 </nav>
+
 <div class="path-container">
-<div class="course-nav">
-            <a href="/courses/basics" class="tab-btn {{ 'active' if lang == 'basics' }}">⌨️ Basics</a>
-        <a href="/courses/python" class="tab-btn {{ 'active' if lang == 'python' }}">🐍 Python</a>
-        <a href="/courses/javascript" class="tab-btn {{ 'active' if lang == 'javascript' }}">⚡ JavaScript</a>
-        <a href="/courses/java" class="tab-btn {{ 'active' if lang == 'java' }}">☕ Java</a>
+    <!-- Language Navigation Tabs -->
+    <div class="course-nav">
+        {% if languages %}
+            {% for lang_key, lang_info in languages.items() %}
+            <a href="/courses/{{ lang_key }}" class="tab-btn {{ 'active' if lang == lang_key }}">
+                {{ lang_info.icon }} {{ lang_info.name }}
+            </a>
+            {% endfor %}
+        {% else %}
+            <a href="/courses/basics" class="tab-btn {{ 'active' if lang == 'basics' }}">⌨️ Typing Basics</a>
+            <a href="/courses/python" class="tab-btn {{ 'active' if lang == 'python' }}">🐍 Python</a>
+            <a href="/courses/javascript" class="tab-btn {{ 'active' if lang == 'javascript' }}">⚡ JavaScript</a>
+            <a href="/courses/java" class="tab-btn {{ 'active' if lang == 'java' }}">☕ Java</a>
+        {% endif %}
     </div>
 
-    <h1>{{ lang|capitalize }} Path</h1>
+    {% if lang_info %}
+        <h1>{{ lang_info.icon }} {{ lang_info.name }} Path</h1>
+        <p style="color: var(--text-dim); margin-bottom: 30px;">{{ lang_info.description }}</p>
+    {% else %}
+        <h1>{{ lang|capitalize }} Path</h1>
+    {% endif %}
     
     {% for lesson in lessons %}
-        {# Language tracks are not locked (id 1 is always open), but Basics follow strict progression #}
         {% set current_level = data.get(lang + '_level', 1) %}
         {% set is_locked = (lang == 'basics' and lesson.id > current_level) %}
         {% set score_dict = data.get(lang + '_scores', {}) %}
         {% set best_score = score_dict.get(lesson.id|string, 0) %}
+        {% set stars = calculate_stars(best_score) %}
         
-        <div class="lesson-node" style="{{ 'opacity: 0.5; filter: grayscale(1);' if is_locked }}">
-            <div style="flex: 1; text-align: left;">
-                <span style="color: var(--accent-secondary); font-family: 'JetBrains Mono';">0{{ lesson.id }}</span>
-                <h3 style="display: inline; margin-left: 15px;">{{ lesson.title }}</h3>
+        <div class="lesson-node {% if is_locked %}locked-overlay{% endif %}">
+            <div class="lesson-info">
+                <div class="lesson-title">
+                    <span class="lesson-number">Lesson {{ lesson.id }}</span>
+                    <span class="lesson-name">{{ lesson.title }}</span>
+                </div>
                 
+                <!-- Star Rating Display -->
                 {% if best_score > 0 %}
-                <div class="stars" style="margin-left: 45px;">
-                    {{ '⭐' * (3 if best_score >= 70 else 1) }}{{ '⭐' if best_score >= 85 }}{{ '⭐' if best_score >= 95 }}
-                    <small>({{ best_score }}%)</small>
+                <div class="stars-container">
+                    <div class="stars">
+                        {% for i in range(1, 6) %}
+                            {% if i <= stars %}
+                                <span class="star filled">★</span>
+                            {% else %}
+                                <span class="star empty">☆</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span class="accuracy-badge">{{ best_score }}% accuracy</span>
+                </div>
+                {% else %}
+                <div class="stars-container">
+                    <div class="stars">
+                        {% for i in range(1, 6) %}
+                            <span class="star empty">☆</span>
+                        {% endfor %}
+                    </div>
+                    <span class="accuracy-badge">Not attempted yet</span>
                 </div>
                 {% endif %}
             </div>
 
-            {% if is_locked %}
-                <button class="btn-main" style="background: #334155 !important;">Locked</button>
-            {% else %}
-                <button onclick="window.location.href='/lesson/{{ lang }}/{{ lesson.id }}'" class="btn-main">
-                    {{ 'Retry' if best_score > 0 else 'Start' }}
-                </button>
-            {% endif %}
+            <div class="button-group">
+                {% if is_locked %}
+                    <button class="btn-locked" disabled>🔒 Locked</button>
+                {% else %}
+                    {% if best_score > 0 %}
+                        <!-- Retry button for lessons that have been attempted -->
+                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, true)" class="btn-retry">
+                            🔄 Retry
+                        </button>
+                        <!-- Start/Continue button -->
+                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">
+                            ▶ Continue
+                        </button>
+                    {% else %}
+                        <!-- Start button for new lessons -->
+                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">
+                            ▶ Start
+                        </button>
+                    {% endif %}
+                {% endif %}
+            </div>
         </div>
     {% endfor %}
 </div>
 
 <script>
-    function checkAndGoToDashboard() {
+    function startLesson(language, lessonId, isRetry = false) {
         fetch('/check_auth')
             .then(res => res.json())
             .then(data => {
                 if (data.logged_in) {
-                    window.location.href = '/dashboard';
+                    // If retry, add a parameter to track it
+                    let url = `/lesson/${language}/${lessonId}`;
+                    if (isRetry) {
+                        url += '?retry=true';
+                    }
+                    window.location.href = url;
                 } else {
-                    sessionStorage.setItem('pendingUrl', '/dashboard');
-                    window.location.href = '/?login_required=dashboard';
+                    sessionStorage.setItem('pendingLessonUrl', `/lesson/${language}/${lessonId}`);
+                    window.location.href = '/?login_required=lesson';
                 }
             });
     }
-    
-    function startLesson(lessonUrl) {
+
+    function checkAuthAndStartLesson(lessonUrl) {
         fetch('/check_auth')
             .then(res => res.json())
             .then(data => {
@@ -128,6 +317,23 @@
                 }
             });
     }
+    
+    // Check authentication status on page load
+    fetch('/check_auth')
+        .then(res => res.json())
+        .then(data => {
+            if (data.logged_in) {
+                const authSection = document.getElementById('auth-section');
+                if (authSection) {
+                    authSection.innerHTML = `
+                        <span class="user-info">
+                            <span class="welcome-text">👋 ${data.name}</span>
+                            <a href="/logout" class="logout-btn">Logout</a>
+                        </span>
+                    `;
+                }
+            }
+        });
 </script>
 </body>
 </html>
