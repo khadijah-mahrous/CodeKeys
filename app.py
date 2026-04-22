@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from functools import wraps
+import json
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here_change_this_12345'
@@ -8,27 +9,62 @@ app.secret_key = 'your_secret_key_here_change_this_12345'
 users_db = {}
 user_progress = {}
 
-# Lesson database
+# Import lessons from separate files
+from lessons.basics_lessons import BASICS_LESSONS
+from lessons.python_lessons import PYTHON_LESSONS
+from lessons.javascript_lessons import JAVASCRIPT_LESSONS
+from lessons.java_lessons import JAVA_LESSONS
+
+def calculate_stars(accuracy):
+    """Convert accuracy percentage to star rating (1-5)"""
+    if accuracy >= 95:
+        return 5
+    elif accuracy >= 80:
+        return 4
+    elif accuracy >= 70:
+        return 3
+    elif accuracy >= 60:
+        return 2
+    elif accuracy >= 50:
+        return 1
+    else:
+        return 0
+    
+# Lesson database - references to imported lesson arrays
 lessons_db = {
-    "basics": [
-        {"id": 1, "title": "Home Row: F & J", "target": "ffff jjjj", "instr": "Focus on your index fingers."},
-        {"id": 2, "title": "Home Row: D & K", "target": "dddd kkkk", "instr": "Focus on your middle fingers."}
-    ],
-    "python": [
-        {"id": 1, "title": "Output", "target": "print('Hello World')", "instr": "The print() function outputs text to the console."},
-        {"id": 2, "title": "Variables", "target": "user_val = input()", "instr": "input() captures user data into a variable."}
-    ],
-    "javascript": [
-        {"id": 1, "title": "Output", "target": "console.log('Hello');", "instr": "console.log() is used to print debugging info."},
-        {"id": 2, "title": "Variables", "target": "let val = prompt();", "instr": "let declares a variable."}
-    ],
-    "java": [
-        {"id": 1, "title": "Output", "target": "System.out.println();", "instr": "Standard way to print a line in Java."},
-        {"id": 2, "title": "Variables", "target": "Scanner in = new Scanner();", "instr": "The Scanner class is used for input."}
-    ]
+    "basics": BASICS_LESSONS,
+    "python": PYTHON_LESSONS,
+    "javascript": JAVASCRIPT_LESSONS,
+    "java": JAVA_LESSONS
 }
 
-
+# Language metadata - Make sure this is defined BEFORE the routes
+LANGUAGE_INFO = {
+    "basics": {
+        "name": "Typing Basics",
+        "description": "Master the fundamentals of touch typing with proper finger placement.",
+        "icon": "⌨️",
+        "color": "#8b5cf6"
+    },
+    "python": {
+        "name": "Python Programming",
+        "description": "Learn Python syntax while building typing speed. Perfect for beginners!",
+        "icon": "🐍",
+        "color": "#06b6d4"
+    },
+    "javascript": {
+        "name": "JavaScript",
+        "description": "Master JavaScript fundamentals and modern ES6+ syntax through typing practice.",
+        "icon": "⚡",
+        "color": "#fbbf24"
+    },
+    "java": {
+        "name": "Java",
+        "description": "Build strong Java programming skills with hands-on typing exercises.",
+        "icon": "☕",
+        "color": "#ef4444"
+    }
+}
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -45,13 +81,22 @@ def signup():
         "password": password
     }
     
+    # Initialize progress for all languages
     user_progress[email] = {
         "username": name,
         "email": email,
         "level": 1,
         "total_words": 0,
         "accuracy": 0,
-        "problem_keys": []
+        "problem_keys": [],
+        "basics_level": 1,
+        "python_level": 1,
+        "javascript_level": 1,
+        "java_level": 1,
+        "basics_scores": {},
+        "python_scores": {},
+        "javascript_scores": {},
+        "java_scores": {}
     }
     
     session['user_id'] = email
@@ -76,7 +121,6 @@ def logout():
     session.pop('user_id', None)
     session.pop('user_name', None)
     return redirect(url_for('index'))
-    
 
 @app.route('/check_auth')
 def check_auth():
@@ -87,68 +131,102 @@ def check_auth():
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
-        # Change jsonify to redirect
         return redirect(url_for('index', login_required='dashboard'))
     
-    # Fetch the latest user data, ensuring level defaults to 1 if it's a new user
     user_data = user_progress.get(session['user_id'], {
         "username": session.get('user_name', 'User'),
         "level": 1,
         "accuracy": 0
     })
-    return render_template('dashboard.html', data=user_data)
+    return render_template('dashboard.html', data=user_data, languages=LANGUAGE_INFO)
 
 @app.route('/')
 def index():
     user_id = session.get('user_id')
-    # If logged in, get their level. If not, default to 1.
     user_data = user_progress.get(user_id, {"level": 1}) if user_id else {"level": 1}
-    return render_template('index.html', data=user_data)
+    return render_template('index.html', data=user_data, languages=LANGUAGE_INFO)
 
 @app.route('/courses/<language>')
 def courses(language):
+    if language not in lessons_db:
+        return "Language not found", 404
+    
     user_id = session.get('user_id')
-    # Default to level 1 and empty scores if no data exists yet
-    data = user_progress.get(user_id, {"level": 1, "lesson_scores": {}}) if user_id else {"level": 1}
+    data = user_progress.get(user_id, {}) if user_id else {}
     
     lang_lessons = lessons_db.get(language, [])
-    return render_template('courses.html', lessons=lang_lessons, lang=language, data=data)
+    
+    # Pass the calculate_stars function to the template
+    return render_template('courses.html', 
+                          lessons=lang_lessons, 
+                          lang=language, 
+                          data=data, 
+                          lang_info=LANGUAGE_INFO.get(language, {}),
+                          languages=LANGUAGE_INFO,
+                          calculate_stars=calculate_stars)
 
 @app.route('/intro/<language>')
 def language_intro(language):
+    if language not in LANGUAGE_INFO:
+        return "Language not found", 404
+    
     user_id = session.get('user_id')
     data = user_progress.get(user_id, {"level": 1}) if user_id else {"level": 1}
     
-    descriptions = {
-        "python": "Python is a powerful language used for AI.",
-        "javascript": "JavaScript is the language of the web.", 
-        "java": "Java is used for enterprise apps."
-    }
-    desc = descriptions.get(language, "Explore coding.")
-    return render_template('intro.html', lang=language, description=desc, data=data)
+    lang_info = LANGUAGE_INFO.get(language, {})
+    return render_template('intro.html', lang=language, description=lang_info.get('description', ''), data=data, lang_info=lang_info)
 
 @app.route('/lesson/<language>/<int:lesson_id>')
 def lesson(language, lesson_id):
     if 'user_id' not in session:
         return redirect(url_for('index', login_required='lesson'))
+    
+    if language not in lessons_db:
+        return "Language not found", 404
         
     user_id = session['user_id']
-    data = user_progress.get(user_id, {"level": 1})
+    data = user_progress.get(user_id, {})
     
-    # Use .get(language) so it searches the specific track (python, java, etc.)
     track_lessons = lessons_db.get(language, [])
     current_lesson = next((l for l in track_lessons if l['id'] == lesson_id), None)
     
     if not current_lesson:
         return "Lesson not found", 404
         
-    return render_template('lesson.html', lang=language, lesson=current_lesson, data=data)
-user_progress = {} 
+    return render_template('lesson.html', lang=language, lesson=current_lesson, data=data, lang_info=LANGUAGE_INFO.get(language, {}))
+
+@app.route('/get_next_lesson/<language>')
+def get_next_lesson(language):
+    """Returns the next available lesson ID for a specific language"""
+    if 'user_id' not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    if language not in lessons_db:
+        return jsonify({"error": "Language not found"}), 404
+    
+    user_email = session['user_id']
+    user_data = user_progress.get(user_email, {})
+    
+    # Get current level for this language (default to 1)
+    current_level = user_data.get(f"{language}_level", 1)
+    total_lessons = len(lessons_db.get(language, []))
+    
+    # Don't exceed total lessons
+    if current_level > total_lessons:
+        current_level = total_lessons
+    
+    return jsonify({
+        "next_lesson_id": current_level,
+        "total_lessons": total_lessons
+    })
 
 @app.route('/process_stats', methods=['POST'])
 def process_stats():
     data = request.get_json()
     email = session.get('user_id')
+    
+    if not email or email not in user_progress:
+        return jsonify({"status": "error"}), 404
     
     lang = data.get('lang', 'basics')
     lesson_id = int(data.get('lesson_id'))
@@ -156,55 +234,104 @@ def process_stats():
     wpm = data.get('wpm', 0)
     mistakes = data.get('mistakes', 0)
     total_chars = data.get('total_chars', 0)
+    
+    # Debug print to see what's coming in
+    print(f"Processing stats - Lang: {lang}, Lesson: {lesson_id}")
+    print(f"Accuracy: {new_acc}%, WPM: {wpm}, Mistakes: {mistakes}, Total Chars: {total_chars}")
 
-    if email in user_progress:
-        # Save for Result page
-        session['last_results'] = {
-            "accuracy": new_acc, 
-            "wpm": wpm, 
-            "mistakes": mistakes,
-            "total_chars": total_chars
-        }
-        
-        # Track progress per language
-        score_key = f"{lang}_scores"
-        level_key = f"{lang}_level"
-        
-        if score_key not in user_progress[email]:
-            user_progress[email][score_key] = {}
-        
-        # Save best accuracy
-        old_acc = user_progress[email][score_key].get(str(lesson_id), 0)
-        if new_acc > old_acc:
-            user_progress[email][score_key][str(lesson_id)] = new_acc
+    # Save for Result page
+    session['last_results'] = {
+        "accuracy": new_acc, 
+        "wpm": wpm, 
+        "mistakes": mistakes,
+        "total_chars": total_chars,
+        "lesson_id": lesson_id,
+        "lang": lang
+    }
+    
+    # Track progress per language
+    score_key = f"{lang}_scores"
+    level_key = f"{lang}_level"
+    
+    if score_key not in user_progress[email]:
+        user_progress[email][score_key] = {}
+    
+    # Save best accuracy
+    old_acc = user_progress[email][score_key].get(str(lesson_id), 0)
+    if new_acc > old_acc:
+        user_progress[email][score_key][str(lesson_id)] = new_acc
+        print(f"New best accuracy saved: {new_acc}% (was {old_acc}%)")
 
-        # Progression logic
-        current_level = user_progress[email].get(level_key, 1)
-        if new_acc >= 70 and lesson_id == current_level:
-            user_progress[email][level_key] = current_level + 1
-            
-        session.modified = True
-        return jsonify({"status": "success"})
-    return jsonify({"status": "error"}), 404
+    # Progression logic - only progress if accuracy >= 70 and it's the current level
+    current_level = user_progress[email].get(level_key, 1)
+    total_lessons = len(lessons_db.get(lang, []))
+    
+    if new_acc >= 70 and lesson_id == current_level and lesson_id < total_lessons:
+        user_progress[email][level_key] = current_level + 1
+        print(f"Progressed to level {current_level + 1} in {lang}")
+        
+    session.modified = True
+    return jsonify({"status": "success"})
+
 @app.route('/resume')
 def resume_learning():
     if 'user_id' not in session:
         return redirect(url_for('index', login_required='lesson'))
     
-    user_data = user_progress.get(session['user_id'], {"level": 1})
-    current_level = user_data.get('level', 1)
-    
-    # This automatically picks up exactly where the user left off
-    return redirect(url_for('lesson', language='python', lesson_id=current_level))
+    return redirect(url_for('courses', language='python'))
 
 @app.route('/results/<language>/<int:lesson_id>')
 def results(language, lesson_id):
-    res = session.get('last_results', {"accuracy": 0, "total_chars": 0, "mistakes": 0})
+    # Get results from session
+    res = session.get('last_results', {})
+    
+    accuracy = res.get('accuracy', 0)
+    total_chars = res.get('total_chars', 0)
+    mistakes = res.get('mistakes', 0)
+    wpm = res.get('wpm', 0)
+    
+    # Calculate stars based on accuracy
+    if accuracy >= 95:
+        stars = 5
+        star_message = "Perfect! 🌟🌟🌟🌟🌟"
+    elif accuracy >= 80:
+        stars = 4
+        star_message = "Great! 🌟🌟🌟🌟"
+    elif accuracy >= 70:
+        stars = 3
+        star_message = "Good! 🌟🌟🌟"
+    elif accuracy >= 60:
+        stars = 2
+        star_message = "Keep practicing! 🌟🌟"
+    elif accuracy >= 50:
+        stars = 1
+        star_message = "Try again! 🌟"
+    else:
+        stars = 0
+        star_message = "Need more practice!"
+    
+    # Get the lesson title
+    track_lessons = lessons_db.get(language, [])
+    lesson = next((l for l in track_lessons if l['id'] == lesson_id), None)
+    lesson_title = lesson['title'] if lesson else f"Lesson {lesson_id}"
+    
+    # Determine if passed (70% or higher)
+    passed = accuracy >= 70
+    
+    total_lessons = len(track_lessons)
+    
     return render_template('result.html', 
-                           accuracy=res['accuracy'], 
-                           total_chars=res['total_chars'],
-                           mistakes=res['mistakes'],
+                           accuracy=accuracy, 
+                           total_chars=total_chars,
+                           mistakes=mistakes,
+                           wpm=wpm,
                            lang=language,
-                           lesson_id=lesson_id)
+                           lesson_id=lesson_id,
+                           lesson_title=lesson_title,
+                           stars=stars,
+                           star_message=star_message,
+                           passed=passed,
+                           total_lessons=total_lessons)
+
 if __name__ == '__main__':
     app.run(debug=True)
