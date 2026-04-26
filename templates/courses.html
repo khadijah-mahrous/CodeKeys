@@ -217,6 +217,9 @@
     {% if lang_info %}
         <h1>{{ lang_info.icon }} {{ lang_info.name }} Path</h1>
         <p style="color: var(--text-dim); margin-bottom: 30px;">{{ lang_info.description }}</p>
+        <div style="margin-bottom: 20px;">
+    <button onclick="viewIntro('{{ lang }}')" class="btn-small" style="background: rgba(139,92,246,0.2) !important;">📖 View Intro & Tips</button>
+</div>
     {% else %}
         <h1>{{ lang|capitalize }} Path</h1>
     {% endif %}
@@ -226,14 +229,20 @@
         {% set score_dict = data.get(lang + '_scores', {}) %}
         {% set best_score = score_dict.get(lesson.id|string, 0) %}
         {% set stars = calculate_stars(best_score) %}
-        {% set is_locked = (lesson.id > current_level) or (lesson.id > 1 and best_score < 70) %}
-        
+{% if lang == "basics" %}
+    {% set is_locked = lesson.id > current_level %}
+{% else %}
+    {% set is_locked = false %}
+{% endif %}   
         <div class="lesson-node {% if is_locked %}locked-overlay{% endif %}">
             <div class="lesson-info">
                 <div class="lesson-title">
-                    <span class="lesson-number">Lesson {{ lesson.id }}</span>
-                    <span class="lesson-name">{{ lesson.title }}</span>
-                </div>
+    <span class="lesson-number">Lesson {{ lesson.id }}</span>
+    <span class="lesson-name">{{ lesson.title }}</span>
+    {% if lesson.is_exam %}
+        <span style="background: linear-gradient(135deg, #e74c3c, #c0392b); padding: 2px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: bold; margin-left: 8px;">📋 EXAM</span>
+    {% endif %}
+</div>
                 
                 <!-- Star Rating Display -->
                 {% if best_score > 0 %}
@@ -263,40 +272,53 @@
                 {% endif %}
             </div>
 
-            <div class="button-group">
-                {% if is_locked %}
-                    <button class="btn-locked" disabled>🔒 Locked</button>
-                {% else %}
-                    {% if best_score == 0 %}
-                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">▶ Start</button>
-                    {% elif best_score < 70 %}
-                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, true)" class="btn-retry">🔄 Retry</button>
-                    {% else %}
-                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">▶ Continue</button>
-                    {% endif %}
-                {% endif %}
-            </div>
+           <div class="button-group">
+    {% if is_locked %}
+        <button class="btn-locked" disabled>🔒 Locked</button>
+    {% else %}
+        {% set required_pass = lesson.pass_score if lesson.is_exam else 70 %}
+        {% if best_score == 0 %}
+            <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">▶ Start</button>
+        {% elif best_score < required_pass %}
+            <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, true)" class="btn-retry">
+                {% if lesson.is_exam %}📋 Retry Exam{% else %}🔄 Retry{% endif %}
+            </button>
+        {% else %}
+            <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">
+                {% if lesson.is_exam %}✅ View Exam{% else %}▶ Continue{% endif %}
+            </button>
+        {% endif %}
+    {% endif %}
+</div>
         </div>
     {% endfor %}
 </div>
 
 <script>
-    function startLesson(language, lessonId, isRetry = false) {
-        fetch('/check_auth')
-            .then(res => res.json())
-            .then(data => {
-                if (data.logged_in) {
-                    let url = `/lesson/${language}/${lessonId}`;
-                    if (isRetry) {
-                        url += '?retry=true';
-                    }
-                    window.location.href = url;
+function startLesson(language, lessonId, isRetry = false) {
+    fetch('/check_auth')
+        .then(res => res.json())
+        .then(data => {
+            if (data.logged_in) {
+                // Show intro only for lesson 1 when not a retry
+                if (lessonId === 1 && !isRetry) {
+                    sessionStorage.setItem('pendingLesson', JSON.stringify({
+                        language: language,
+                        lessonId: lessonId,
+                        isRetry: isRetry
+                    }));
+                    window.location.href = `/intro/${language}`;
                 } else {
-                    sessionStorage.setItem('pendingLessonUrl', `/lesson/${language}/${lessonId}`);
-                    window.location.href = '/?login_required=lesson';
+                    let url = `/lesson/${language}/${lessonId}`;
+                    if (isRetry) url += '?retry=true';
+                    window.location.href = url;
                 }
-            });
-    }
+            } else {
+                sessionStorage.setItem('pendingLessonUrl', `/lesson/${language}/${lessonId}`);
+                window.location.href = '/?login_required=lesson';
+            }
+        });
+}
 
     function checkAuthAndStartLesson(lessonUrl) {
         fetch('/check_auth')
@@ -327,6 +349,11 @@
                 }
             }
         });
+       function viewIntro(language) {
+    // Add manual=true to always show intro even if skip flag is set
+    window.location.href = `/intro/${language}?manual=true`;
+}
+
 </script>
 </body>
 </html>

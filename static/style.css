@@ -68,6 +68,28 @@ nav {
     z-index: 10000;
     margin-bottom: 0;
 }
+.teacher-note {
+    background: rgba(6, 182, 212, 0.1);
+    border-left: 4px solid var(--accent-secondary);
+    padding: 15px 20px;
+    border-radius: 8px;
+    max-width: 800px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.teacher-note p {
+    color: var(--text-bright);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.note-icon {
+    font-size: 1.5rem;
+}
 
 .logo {
     font-family: 'JetBrains Mono', monospace;

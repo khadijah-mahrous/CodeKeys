@@ -172,13 +172,20 @@
         
         <!-- Status Header -->
         <div class="status-header">
-            {% if passed %}
+    {% if lesson.is_exam %}
+        {% if accuracy >= lesson.pass_score|default(80) %}
+            <span class="status-pass">✓ EXAM PASSED</span>
+        {% else %}
+            <span class="status-fail">⚠ EXAM FAILED (Need {{ lesson.pass_score|default(80) }}%+)</span>
+        {% endif %}
+    {% else %}
+        {% if passed %}
             <span class="status-pass">✓ MISSION COMPLETE</span>
-            {% else %}
-            <span class="status-fail">⚠ MISSION FAILED</span>
-            {% endif %}
-        </div>
-
+        {% else %}
+            <span class="status-fail">⚠ MISSION FAILED (Need 70%+)</span>
+        {% endif %}
+    {% endif %}
+</div>
         <!-- Lesson Title -->
         <div class="lesson-title">
             {{ lesson_title }}
@@ -226,17 +233,54 @@
         <!-- Action Buttons -->
         <div class="action-area">
             {% if passed %}
-                {% set next_lesson = lesson_id + 1 %}
-<a href="#" id="nextBtn" class="btn-action btn-next">Next Lesson →</a>
-           {% endif %}
-            <a href="/lesson/{{ lang }}/{{ lesson_id }}" class="btn-action btn-retry">Try Again ↻</a>
-            <a href="/courses/{{ lang }}" class="btn-action btn-dashboard">Back to Course</a>
+    {% set next_lesson = lesson_id + 1 %}
+    <a href="#" id="nextBtn" class="btn-action btn-next">Next Lesson →</a>
+{% endif %}
+<a href="#" onclick="retryLesson()" class="btn-action btn-retry">Try Again ↻</a>
+      <a href="/courses/{{ lang }}" class="btn-action btn-dashboard">Back to Course</a>
         </div>
 
     </div>
 </div>
 
 <script>
+   function retryLesson() {
+    var lessonId = {{ lesson_id }};
+    if (lessonId === 1) {
+        sessionStorage.setItem('pendingLesson', JSON.stringify({
+            language: '{{ lang }}',
+            lessonId: lessonId,
+            isRetry: true
+        }));
+        window.location.href = `/intro/{{ lang }}`;
+    } else {
+        window.location.href = `/lesson/{{ lang }}/${lessonId}?retry=true`;
+    }
+}
+
+document.getElementById('nextBtn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    fetch('/get_next_lesson/{{ lang }}')
+    .then(res => res.json())
+    .then(data => {
+        const nextId = data.next_lesson_id;
+        if (nextId) {
+            // Show intro only if next lesson is 1
+            if (nextId === 1) {
+                sessionStorage.setItem('pendingLesson', JSON.stringify({
+                    language: '{{ lang }}',
+                    lessonId: nextId,
+                    isRetry: false
+                }));
+                window.location.href = `/intro/{{ lang }}`;
+            } else {
+                window.location.href = `/lesson/{{ lang }}/${nextId}`;
+            }
+        } else {
+            window.location.href = `/courses/{{ lang }}`;
+        }
+    });
+});
     // Debug - log the results
     console.log("Results page loaded with:", {
         accuracy: {{ accuracy }},
@@ -246,15 +290,6 @@
         stars: {{ stars }}
     });
 
-    document.getElementById('nextBtn')?.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        fetch('/get_next_lesson/{{ lang }}')
-        .then(res => res.json())
-        .then(data => {
-            window.location.href = `/lesson/{{ lang }}/${data.next_lesson_id}`;
-        });
-    });
 </script>
 </body>
 </html>

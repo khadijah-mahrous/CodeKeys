@@ -264,14 +264,12 @@
 </div>
 
 <div class="hero">
-    <h1>Learn to Type. Learn to Code.</h1>
-    <p>Master typing while actually learning Python, JavaScript, and Java with a personal AI coach.</p>
-    <!-- Continue Learning button - only for Basics, only shown when logged in -->
+    <h1>From zero to coding hero.</h1>
+    <p style="font-size: 1.1rem; max-width: 600px; margin: 10px auto;">Learn proper typing while building real programming skills.</p>
     <div id="continue-learning-container" style="display: none;">
-        <a href="javascript:void(0)" class="btn-main continue-btn" id="continue-btn">Continue Learning Basics →</a>
+        <a href="javascript:void(0)" class="btn-main continue-btn" id="continue-btn">Continue Learning →</a>
     </div>
-    <!-- Show Start button when not logged in -->
-    <a href="/courses/basics" class="btn-main" id="start-btn">Start with Basics →</a>
+<a href="/intro/basics" class="btn-main" id="start-btn">Start with Basics →</a>
 </div>
 
 <div class="card-section">
@@ -439,22 +437,25 @@
         });
     }
     
-   // New function to handle course starting with progress tracking
-function handleCourseStart(language) {
+ function handleCourseStart(language) {
     fetch('/check_auth')
         .then(res => res.json())
         .then(data => {
             if (data.logged_in) {
-                // User is logged in, get their next lesson
                 fetch(`/get_next_lesson/${language}`)
                     .then(res => res.json())
                     .then(lessonData => {
-                        if (lessonData.next_lesson_id) {
-                            // Redirect to the lesson they stopped at
-                            window.location.href = `/lesson/${language}/${lessonData.next_lesson_id}`;
-                        } else {
-                            // Fallback to intro page
+                        const nextLessonId = lessonData.next_lesson_id || 1;
+                        // Show intro only if next lesson is lesson 1
+                        if (nextLessonId === 1) {
+                            sessionStorage.setItem('pendingLesson', JSON.stringify({
+                                language: language,
+                                lessonId: nextLessonId,
+                                isRetry: false
+                            }));
                             window.location.href = `/intro/${language}`;
+                        } else {
+                            window.location.href = `/lesson/${language}/${nextLessonId}`;
                         }
                     })
                     .catch(error => {
@@ -462,36 +463,38 @@ function handleCourseStart(language) {
                         window.location.href = `/intro/${language}`;
                     });
             } else {
-                // User not logged in, store pending language and show login
                 pendingUrl = `/intro/${language}`;
                 openModal();
             }
         });
 }
 
-// Update the continue learning button for Basics
 function handleContinueBasics() {
     fetch('/check_auth')
         .then(res => res.json())
         .then(data => {
             if (data.logged_in) {
-                // Get next lesson for basics
                 fetch('/get_next_lesson/basics')
                     .then(res => res.json())
                     .then(lessonData => {
-                        if (lessonData.next_lesson_id) {
-                            window.location.href = `/lesson/basics/${lessonData.next_lesson_id}`;
+                        const nextLessonId = lessonData.next_lesson_id || 1;
+                        if (nextLessonId === 1) {
+                            sessionStorage.setItem('pendingLesson', JSON.stringify({
+                                language: 'basics',
+                                lessonId: nextLessonId,
+                                isRetry: false
+                            }));
+                            window.location.href = '/intro/basics';
                         } else {
-                            window.location.href = '/courses/basics';
+                            window.location.href = `/lesson/basics/${nextLessonId}`;
                         }
                     });
             } else {
-                pendingUrl = '/courses/basics';
+                pendingUrl = '/intro/basics';
                 openModal();
             }
         });
 }
-
 // Update the updateUIForLoggedInUser function
 function updateUIForLoggedInUser(name) {
     const authSection = document.getElementById('auth-section');
