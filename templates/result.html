@@ -215,20 +215,20 @@
         <hr>
 
         <!-- Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-box">
-                <div class="stat-label">Characters Typed</div>
-                <div class="stat-value">{{ total_chars }}</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Mistakes</div>
-                <div class="stat-value" style="color: #ff5f56;">{{ mistakes }}</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Speed</div>
-                <div class="stat-value">{{ wpm }} <span class="stat-unit">WPM</span></div>
-            </div>
-        </div>
+       <div class="stats-grid">
+    <div class="stat-box">
+        <div class="stat-label">Characters Typed</div>
+        <div class="stat-value">{{ total_chars }}</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-label">Mistakes</div>
+        <div class="stat-value" style="color: #ff5f56;">{{ mistakes }}</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-label">Speed</div>
+        <div class="stat-value">{{ wpm }} <span class="stat-unit">WPM</span></div>
+    </div>
+</div>
 
         <!-- Action Buttons -->
         <div class="action-area">
@@ -289,7 +289,47 @@ document.getElementById('nextBtn')?.addEventListener('click', function(e) {
         wpm: {{ wpm }},
         stars: {{ stars }}
     });
+    // Save typing statistics after lesson completion
+function saveTypingStats() {
+    fetch('/save_typing_stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            language: '{{ lang }}',
+            wpm: {{ wpm }},
+            accuracy: {{ accuracy }},
+            mistakes: {{ mistakes }},
+            chars_typed: {{ total_chars }}
+        })
+    });
+}
+saveTypingStats();
 
+</script>
+<script>
+    // Override the saveTypingStats function to ensure correct data
+    function saveTypingStats() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const accuracy = urlParams.get('accuracy') || {{ accuracy }};
+        const mistakes = urlParams.get('mistakes') || {{ mistakes }};
+        const wpm = urlParams.get('wpm') || {{ wpm }};
+        const totalChars = urlParams.get('total_chars') || {{ total_chars }};
+        
+        fetch('/save_typing_stats', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                language: '{{ lang }}',
+                wpm: parseInt(wpm),
+                accuracy: parseInt(accuracy),
+                mistakes: parseInt(mistakes),
+                chars_typed: parseInt(totalChars)
+            })
+        }).catch(err => console.error("Error saving stats:", err));
+    }
+    
+    // Call saveTypingStats after a short delay
+    setTimeout(saveTypingStats, 500);
 </script>
 </body>
 </html>
