@@ -193,6 +193,8 @@
     <div class="nav-links">
         <a href="/">Home</a>
         <a href="/dashboard">Dashboard</a>
+        <a href="/courses/python">Courses</a>
+
         <div id="auth-section"></div>
     </div>
 </nav>
@@ -218,8 +220,8 @@
         <h1>{{ lang_info.icon }} {{ lang_info.name }} Path</h1>
         <p style="color: var(--text-dim); margin-bottom: 30px;">{{ lang_info.description }}</p>
         <div style="margin-bottom: 20px;">
-    <button onclick="viewIntro('{{ lang }}')" class="btn-small" style="background: rgba(139,92,246,0.2) !important;">📖 View Intro & Tips</button>
-</div>
+            <button onclick="viewIntro('{{ lang }}')" class="btn-small" style="background: rgba(139,92,246,0.2) !important;">📖 View Intro & Tips</button>
+        </div>
     {% else %}
         <h1>{{ lang|capitalize }} Path</h1>
     {% endif %}
@@ -229,67 +231,70 @@
         {% set score_dict = data.get(lang + '_scores', {}) %}
         {% set best_score = score_dict.get(lesson.id|string, 0) %}
         {% set stars = calculate_stars(best_score) %}
-{% if lang == "basics" %}
-    {% set is_locked = lesson.id > current_level %}
-{% else %}
-    {% set is_locked = false %}
-{% endif %}   
+        {% if lang == "basics" %}
+            {% set is_locked = lesson.id > current_level %}
+        {% else %}
+            {% set is_locked = false %}
+        {% endif %}   
         <div class="lesson-node {% if is_locked %}locked-overlay{% endif %}">
             <div class="lesson-info">
                 <div class="lesson-title">
-    <span class="lesson-number">Lesson {{ lesson.id }}</span>
-    <span class="lesson-name">{{ lesson.title }}</span>
-    {% if lesson.is_exam %}
-        <span style="background: linear-gradient(135deg, #e74c3c, #c0392b); padding: 2px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: bold; margin-left: 8px;">📋 EXAM</span>
-    {% endif %}
-</div>
+                    <span class="lesson-number">Lesson {{ lesson.id }}</span>
+                    <span class="lesson-name">{{ lesson.title }}</span>
+                    {% if lesson.is_exam %}
+                        <span style="background: linear-gradient(135deg, #e74c3c, #c0392b); padding: 2px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: bold; margin-left: 8px;">
+                            📋 EXAM {{ lesson.exam_number }}/4
+                        </span>
+                    {% endif %}
+                </div>
                 
                 <!-- Star Rating Display -->
-                {% if best_score > 0 %}
                 <div class="stars-container">
                     <div class="stars">
                         {% for i in range(1, 6) %}
                             {% if stars >= i %}
                                 <span class="star filled">★</span>
-                            {% elif stars >= i - 0.5 %}
+                            {% elif stars > i - 0.5 %}
                                 <span class="star half">★</span>
                             {% else %}
                                 <span class="star empty">☆</span>
                             {% endif %}
                         {% endfor %}
                     </div>
-                    <span class="accuracy-badge">{{ best_score }}%</span>
+                    {% if best_score > 0 %}
+                        <span class="accuracy-badge">{{ best_score }}%</span>
+                    {% else %}
+                        <span class="accuracy-badge">Not Attempted</span>
+                    {% endif %}
+                    
+                    {% if lesson.is_exam and lesson.pass_score %}
+                        <span class="accuracy-badge" style="background: rgba(231,76,60,0.2);">
+                            🎯 Pass: {{ lesson.pass_score }}%
+                        </span>
+                    {% endif %}
                 </div>
-                {% else %}
-                <div class="stars-container">
-                    <div class="stars">
-                        {% for i in range(1, 6) %}
-                            <span class="star empty">☆</span>
-                        {% endfor %}
-                    </div>
-                    <span class="accuracy-badge">Not Attempted</span>
-                </div>
-                {% endif %}
             </div>
 
-           <div class="button-group">
-    {% if is_locked %}
-        <button class="btn-locked" disabled>🔒 Locked</button>
-    {% else %}
-        {% set required_pass = lesson.pass_score if lesson.is_exam else 70 %}
-        {% if best_score == 0 %}
-            <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">▶ Start</button>
-        {% elif best_score < required_pass %}
-            <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, true)" class="btn-retry">
-                {% if lesson.is_exam %}📋 Retry Exam{% else %}🔄 Retry{% endif %}
-            </button>
-        {% else %}
-            <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">
-                {% if lesson.is_exam %}✅ View Exam{% else %}▶ Continue{% endif %}
-            </button>
-        {% endif %}
-    {% endif %}
-</div>
+            <div class="button-group">
+                {% if is_locked %}
+                    <button class="btn-locked" disabled>🔒 Locked</button>
+                {% else %}
+                    {% set required_pass = lesson.pass_score if lesson.is_exam else 70 %}
+                    {% if best_score == 0 %}
+                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">
+                            {% if lesson.is_exam %}📝 Start Exam{% else %}▶ Start{% endif %}
+                        </button>
+                    {% elif best_score < required_pass %}
+                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, true)" class="btn-retry">
+                            {% if lesson.is_exam %}📋 Retry Exam{% else %}🔄 Retry{% endif %}
+                        </button>
+                    {% else %}
+                        <button onclick="startLesson('{{ lang }}', {{ lesson.id }}, false)" class="btn-start">
+                            {% if lesson.is_exam %}✅ View Exam{% else %}▶ Review{% endif %}
+                        </button>
+                    {% endif %}
+                {% endif %}
+            </div>
         </div>
     {% endfor %}
 </div>
@@ -300,7 +305,6 @@ function startLesson(language, lessonId, isRetry = false) {
         .then(res => res.json())
         .then(data => {
             if (data.logged_in) {
-                // Show intro only for lesson 1 when not a retry
                 if (lessonId === 1 && !isRetry) {
                     sessionStorage.setItem('pendingLesson', JSON.stringify({
                         language: language,
@@ -333,7 +337,6 @@ function startLesson(language, lessonId, isRetry = false) {
             });
     }
     
-    // Check authentication status on page load
     fetch('/check_auth')
         .then(res => res.json())
         .then(data => {
@@ -349,11 +352,9 @@ function startLesson(language, lessonId, isRetry = false) {
                 }
             }
         });
-       function viewIntro(language) {
-    // Add manual=true to always show intro even if skip flag is set
-    window.location.href = `/intro/${language}?manual=true`;
-}
-
+    function viewIntro(language) {
+        window.location.href = `/intro/${language}?manual=true`;
+    }
 </script>
 </body>
 </html>
