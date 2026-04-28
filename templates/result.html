@@ -4,159 +4,8 @@
     <meta charset="UTF-8">
     <title>CodeKeys - Mission Report</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<style>
-    body {
-        height: 100vh;
-        overflow: hidden; /* Lock the screen */
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        background: radial-gradient(circle at top right, #1b1b2f, #0a0a0c);
-    }
-
-    .result-full-container {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 10px; /* Reduced padding */
-    }
-
-    .result-glass-panel {
-        width: 95%;
-        max-width: 650px; /* Smaller width */
-        padding: 20px;    /* Smaller padding */
-        background: rgba(255, 255, 255, 0.03) !important;
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        text-align: center;
-    }
-
-    .status-header {
-        font-size: 0.7rem;
-        letter-spacing: 1px;
-        margin-bottom: 10px;
-    }
-
-    .score-circle {
-        width: 130px;  /* Significantly smaller circle */
-        height: 130px;
-        margin: 0 auto 15px;
-        border-radius: 50%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
-        border: 2px solid var(--accent-primary);
-    }
-
-    .score-percent {
-        font-size: 2.2rem; /* Smaller font */
-        font-weight: 800;
-        color: white;
-    }
-
-    .stars-display {
-        margin: 10px 0;
-    }
-
-    .stars {
-        font-size: 1.5rem; /* Smaller stars */
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin: 15px 0;
-    }
-
-    .stat-box {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 10px;
-        border-radius: 10px;
-    }
-
-    .stat-value {
-        font-size: 1.2rem;
-    }
-
-    .action-area {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
-        margin-top: 15px;
-    }
-
-    .btn-action {
-        min-width: 120px;
-        padding: 10px 15px;
-        font-size: 0.75rem;
-    }
-    .score-circle {
-        width: 130px;
-        height: 130px;
-        margin: 0 auto 15px;
-        border-radius: 50%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        /* Using your CSS variables for colors */
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.1));
-        border: 2px solid var(--accent-primary);
-        box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
-    }
-
-    /* Force buttons to match the style.css Global Button Engine */
-    .action-area {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        margin-top: 20px;
-    }
-
-    .btn-action {
-        /* This matches your existing btn-main class perfectly */
-        background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) !important;
-        color: white !important;
-        border: none !important;
-        padding: 10px 20px !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-size: 0.75rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-    }
-
-    /* Distinct look for the "Try Again" button while staying in-theme */
-    .btn-retry {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid var(--border-glass) !important;
-        box-shadow: none !important;
-    }
-
-    .btn-action:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.1);
-        box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
-    }
-
-    /* Style the Mission Text to match the Dashboard diagnostics */
-    .status-pass { color: #2ecc71; font-family: 'JetBrains Mono', monospace; }
-    .status-fail { color: #e74c3c; font-family: 'JetBrains Mono', monospace; }
-</style>
 </head>
-<body>
+<body style="height:100vh; overflow:hidden;">
 
 <nav>
     <div class="logo" onclick="window.location.href='/'">CodeKeys</div>
@@ -169,166 +18,109 @@
 
 <div class="result-full-container">
     <div class="result-glass-panel">
-        
-        <!-- Status Header -->
+
         <div class="status-header">
-    {% if lesson.is_exam %}
-        {% if accuracy >= lesson.pass_score|default(80) %}
-            <span class="status-pass">✓ EXAM PASSED</span>
-        {% else %}
-            <span class="status-fail">⚠ EXAM FAILED (Need {{ lesson.pass_score|default(80) }}%+)</span>
-        {% endif %}
-    {% else %}
-        {% if passed %}
-            <span class="status-pass">✓ MISSION COMPLETE</span>
-        {% else %}
-            <span class="status-fail">⚠ MISSION FAILED (Need 70%+)</span>
-        {% endif %}
-    {% endif %}
-</div>
-        <!-- Lesson Title -->
-        <div class="lesson-title">
-            {{ lesson_title }}
+            {% if lesson.is_exam %}
+                {% if accuracy >= lesson.pass_score|default(80) %}
+                    <span class="status-pass">✓ EXAM PASSED</span>
+                {% else %}
+                    <span class="status-fail">⚠ EXAM FAILED (Need {{ lesson.pass_score|default(80) }}%+)</span>
+                {% endif %}
+            {% else %}
+                {% if passed %}
+                    <span class="status-pass">✓ MISSION COMPLETE</span>
+                {% else %}
+                    <span class="status-fail">⚠ MISSION FAILED (Need 70%+)</span>
+                {% endif %}
+            {% endif %}
         </div>
 
-        <!-- Score Circle -->
-          <!-- Score Circle -->
-        <div class="score-circle">
+        <div style="font-size:1rem; font-weight:600; margin-bottom:10px;">{{ lesson_title }}</div>
+
+        <div class="result-score-circle">
             <div class="score-percent">{{ accuracy }}%</div>
-            <div class="score-label">ACCURACY</div>
+            <div class="score-label" style="font-size:0.7rem; color:var(--text-dim);">ACCURACY</div>
         </div>
 
-        <!-- Stars Display -->
         <div class="stars-display">
-            <div class="stars">
+            <div class="stars" style="font-size:1.5rem;">
                 {% for i in range(1, 6) %}
-                    {% if i <= stars %}
-                        <span class="star-filled">★</span>
-                    {% else %}
-                        <span class="star-empty">☆</span>
-                    {% endif %}
+                    {% if i <= stars %}<span class="star-filled">★</span>{% else %}<span class="star-empty">☆</span>{% endif %}
                 {% endfor %}
             </div>
-            <div class="star-message">{{ star_message }}</div>
+            <div style="font-size:0.8rem; color:var(--text-dim); margin-top:4px;">{{ star_message }}</div>
         </div>
 
-        <hr>
+        <hr style="border-color:var(--border-glass); margin:12px 0;">
 
-        <!-- Stats Grid -->
-       <div class="stats-grid">
-    <div class="stat-box">
-        <div class="stat-label">Characters Typed</div>
-        <div class="stat-value">{{ total_chars }}</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-label">Mistakes</div>
-        <div class="stat-value" style="color: #ff5f56;">{{ mistakes }}</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-label">Speed</div>
-        <div class="stat-value">{{ wpm }} <span class="stat-unit">WPM</span></div>
-    </div>
-</div>
+        <div class="result-stats-grid">
+            <div class="stat-box">
+                <div class="stat-label" style="font-size:0.7rem; color:var(--text-dim);">Characters Typed</div>
+                <div class="stat-value">{{ total_chars }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label" style="font-size:0.7rem; color:var(--text-dim);">Mistakes</div>
+                <div class="stat-value" style="color:#ff5f56;">{{ mistakes }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label" style="font-size:0.7rem; color:var(--text-dim);">Speed</div>
+                <div class="stat-value">{{ wpm }} <span class="stat-unit">WPM</span></div>
+            </div>
+        </div>
 
-        <!-- Action Buttons -->
         <div class="action-area">
             {% if passed %}
-    {% set next_lesson = lesson_id + 1 %}
-    <a href="#" id="nextBtn" class="btn-action btn-next">Next Lesson →</a>
-{% endif %}
-<a href="#" onclick="retryLesson()" class="btn-action btn-retry">Try Again ↻</a>
-      <a href="/courses/{{ lang }}" class="btn-action btn-dashboard">Back to Course</a>
+                <a href="#" id="nextBtn" class="btn-action btn-next">Next Lesson →</a>
+            {% endif %}
+            <a href="#" onclick="retryLesson()" class="btn-action btn-retry">Try Again ↻</a>
+            <a href="/courses/{{ lang }}" class="btn-action">Back to Course</a>
         </div>
 
     </div>
 </div>
 
 <script>
-   function retryLesson() {
-    var lessonId = {{ lesson_id }};
-    if (lessonId === 1) {
-        sessionStorage.setItem('pendingLesson', JSON.stringify({
-            language: '{{ lang }}',
-            lessonId: lessonId,
-            isRetry: true
-        }));
-        window.location.href = `/intro/{{ lang }}`;
-    } else {
-        window.location.href = `/lesson/{{ lang }}/${lessonId}?retry=true`;
-    }
-}
-
-document.getElementById('nextBtn')?.addEventListener('click', function(e) {
-    e.preventDefault();
-    fetch('/get_next_lesson/{{ lang }}')
-    .then(res => res.json())
-    .then(data => {
-        const nextId = data.next_lesson_id;
-        if (nextId) {
-            // Show intro only if next lesson is 1
-            if (nextId === 1) {
-                sessionStorage.setItem('pendingLesson', JSON.stringify({
-                    language: '{{ lang }}',
-                    lessonId: nextId,
-                    isRetry: false
-                }));
-                window.location.href = `/intro/{{ lang }}`;
-            } else {
-                window.location.href = `/lesson/{{ lang }}/${nextId}`;
-            }
+    function retryLesson() {
+        var lessonId = {{ lesson_id }};
+        if (lessonId === 1) {
+            sessionStorage.setItem('pendingLesson', JSON.stringify({ language: '{{ lang }}', lessonId, isRetry: true }));
+            window.location.href = `/intro/{{ lang }}`;
         } else {
-            window.location.href = `/courses/{{ lang }}`;
+            window.location.href = `/lesson/{{ lang }}/${lessonId}?retry=true`;
         }
-    });
-});
-    // Debug - log the results
-    console.log("Results page loaded with:", {
-        accuracy: {{ accuracy }},
-        mistakes: {{ mistakes }},
-        total_chars: {{ total_chars }},
-        wpm: {{ wpm }},
-        stars: {{ stars }}
-    });
-    // Save typing statistics after lesson completion
-function saveTypingStats() {
-    fetch('/save_typing_stats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            language: '{{ lang }}',
-            wpm: {{ wpm }},
-            accuracy: {{ accuracy }},
-            mistakes: {{ mistakes }},
-            chars_typed: {{ total_chars }}
-        })
-    });
-}
-saveTypingStats();
+    }
 
-</script>
-<script>
-    // Override the saveTypingStats function to ensure correct data
+    document.getElementById('nextBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        fetch('/get_next_lesson/{{ lang }}').then(r => r.json()).then(data => {
+            const nextId = data.next_lesson_id;
+            if (nextId) {
+                if (nextId === 1) {
+                    sessionStorage.setItem('pendingLesson', JSON.stringify({ language: '{{ lang }}', lessonId: nextId, isRetry: false }));
+                    window.location.href = `/intro/{{ lang }}`;
+                } else {
+                    window.location.href = `/lesson/{{ lang }}/${nextId}`;
+                }
+            } else {
+                window.location.href = `/courses/{{ lang }}`;
+            }
+        });
+    });
+
     function saveTypingStats() {
         const urlParams = new URLSearchParams(window.location.search);
-        const accuracy = urlParams.get('accuracy') || {{ accuracy }};
-        const mistakes = urlParams.get('mistakes') || {{ mistakes }};
-        const wpm = urlParams.get('wpm') || {{ wpm }};
-        const totalChars = urlParams.get('total_chars') || {{ total_chars }};
-        
         fetch('/save_typing_stats', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 language: '{{ lang }}',
-                wpm: parseInt(wpm),
-                accuracy: parseInt(accuracy),
-                mistakes: parseInt(mistakes),
-                chars_typed: parseInt(totalChars)
+                wpm: parseInt(urlParams.get('wpm') || {{ wpm }}),
+                accuracy: parseInt(urlParams.get('accuracy') || {{ accuracy }}),
+                mistakes: parseInt(urlParams.get('mistakes') || {{ mistakes }}),
+                chars_typed: parseInt(urlParams.get('total_chars') || {{ total_chars }})
             })
-        }).catch(err => console.error("Error saving stats:", err));
+        }).catch(err => console.error('Error saving stats:', err));
     }
-    
-    // Call saveTypingStats after a short delay
     setTimeout(saveTypingStats, 500);
 </script>
 </body>

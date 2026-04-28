@@ -3,265 +3,8 @@
 <head>
     <title>CodeKeys - {{ lang_info.name }} Intro</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
-        }
-
-        nav {
-            flex-shrink: 0;
-        }
-
-        .main-wrapper {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px 20px;
-            overflow: hidden;
-        }
-
-        .content-panel {
-            background: var(--bg-glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-glass);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 900px;
-            padding: 15px 25px;
-            display: flex;
-            gap: 20px;
-            animation: fadeInUp 0.5s ease;
-            position: relative;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Left Column - Image */
-        .left-col {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .visual-guide {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .visual-guide img {
-            width: 100%;
-            max-height: 180px;
-            object-fit: contain;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .home-row-visual {
-            background: rgba(139, 92, 246, 0.2);
-            border-radius: 8px;
-            padding: 8px;
-            margin-top: 10px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-
-        .home-row-visual span.left {
-            color: #8b5cf6;
-            font-weight: bold;
-        }
-
-        .home-row-visual span.right {
-            color: #06b6d4;
-            font-weight: bold;
-        }
-
-        /* Right Column - Instructions */
-        .right-col {
-            flex: 1.5;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .instructions-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        .instruction-card {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 8px 10px;
-            border-left: 3px solid var(--accent-primary);
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .instruction-card:hover {
-            transform: translateX(3px);
-            background: rgba(139, 92, 246, 0.15);
-        }
-
-        .instruction-card.urgent {
-            border-left-color: #e74c3c;
-            background: rgba(231, 76, 60, 0.1);
-        }
-
-        .instruction-card.urgent:hover {
-            background: rgba(231, 76, 60, 0.2);
-        }
-
-        .instruction-title {
-            font-weight: bold;
-            font-size: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .instruction-desc {
-            color: var(--text-dim);
-            font-size: 0.65rem;
-            margin-top: 3px;
-            line-height: 1.3;
-        }
-
-        .warning-box {
-            background: rgba(231, 76, 60, 0.1);
-            border: 1px solid rgba(231, 76, 60, 0.2);
-            border-radius: 8px;
-            padding: 8px 12px;
-            text-align: center;
-        }
-
-        .warning-box p {
-            margin: 0;
-            font-size: 0.7rem;
-            color: #ff8a7a;
-        }
-
-        .btn-main {
-            width: 100%;
-            padding: 10px !important;
-            font-size: 0.8rem !important;
-            margin-top: 5px;
-        }
-
-        .finger-animation {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 5px;
-        }
-
-        .finger {
-            width: 30px;
-            height: 30px;
-            background: rgba(139, 92, 246, 0.3);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            animation: pulse 1.5s infinite;
-        }
-
-        .finger:nth-child(1) { animation-delay: 0s; background: rgba(139, 92, 246, 0.5); }
-        .finger:nth-child(2) { animation-delay: 0.2s; background: rgba(6, 182, 212, 0.5); }
-        .finger:nth-child(3) { animation-delay: 0.4s; background: rgba(139, 92, 246, 0.5); }
-        .finger:nth-child(4) { animation-delay: 0.6s; background: rgba(6, 182, 212, 0.5); }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.2); opacity: 1; }
-        }
-
-        h3 {
-            font-size: 1rem;
-            margin-bottom: 5px;
-            color: var(--accent-primary);
-        }
-
-        hr {
-            border-color: rgba(255,255,255,0.1);
-            margin: 5px 0;
-        }
-
-        /* Checkbox styling */
-        .skip-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 8px;
-            padding: 5px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .skip-checkbox input {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-            accent-color: var(--accent-primary);
-        }
-
-        .skip-checkbox label {
-            font-size: 0.65rem;
-            color: var(--text-dim);
-            cursor: pointer;
-        }
-
-        .skip-checkbox label:hover {
-            color: var(--text-bright);
-        }
-
-        /* Close button (X) */
-        .close-intro {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 5px;
-            transition: all 0.2s ease;
-        }
-
-        .close-intro:hover {
-            color: #e74c3c;
-            transform: scale(1.1);
-        }
-    </style>
 </head>
-<body>
+<body style="height:100vh; overflow:hidden;">
 
 <nav>
     <div class="logo" onclick="window.location.href='/'">CodeKeys</div>
@@ -272,10 +15,10 @@
     </div>
 </nav>
 
-<div class="main-wrapper" id="introWrapper">
+<div class="intro-wrapper" id="introWrapper">
     <div class="content-panel">
-        
-        <!-- LEFT COLUMN: Image + Animation -->
+
+        <!-- LEFT COLUMN -->
         <div class="left-col">
             <div class="visual-guide">
                 <img src="{{ url_for('static', filename='pic.gif') }}" alt="Proper Finger Placement">
@@ -289,96 +32,68 @@
                 <div class="finger">🖐️</div>
                 <div class="finger">✋</div>
             </div>
-            <p style="font-size: 0.6rem; color: var(--text-dim); margin-top: 8px; text-align: center;">
+            <p style="font-size:0.6rem; color:var(--text-dim); margin-top:8px; text-align:center;">
                 Feel the bumps on <strong style="color:#8b5cf6">F</strong> and <strong style="color:#06b6d4">J</strong>
             </p>
         </div>
 
-        <!-- RIGHT COLUMN: Instructions -->
+        <!-- RIGHT COLUMN -->
         <div class="right-col">
-            <h3 style="text-align: center;">📋 BEFORE YOU START</h3>
-            
+            <h3 style="text-align:center; font-size:1rem; color:var(--accent-primary);">📋 BEFORE YOU START</h3>
             <div class="instructions-grid">
                 <div class="instruction-card urgent">
                     <div class="instruction-title">🪑 Sit Straight</div>
                     <div class="instruction-desc">Back straight, feet flat, wrists elevated</div>
                 </div>
-
                 <div class="instruction-card urgent">
                     <div class="instruction-title">🚫 DON'T LOOK DOWN!</div>
                     <div class="instruction-desc">Eyes on screen, trust your fingers</div>
                 </div>
-
                 <div class="instruction-card">
                     <div class="instruction-title">🎯 Accuracy First</div>
                     <div class="instruction-desc">Speed comes naturally. Type correctly.</div>
                 </div>
-
                 <div class="instruction-card">
                     <div class="instruction-title">🔄 Return to Home Row</div>
                     <div class="instruction-desc">Always come back to A S D F J K L ;</div>
                 </div>
             </div>
-
             <div class="warning-box">
                 <p>✅ 65%+ accuracy = unlock next lesson &nbsp;|&nbsp; 📋 Exams need 80%+</p>
-                <p style="font-size: 0.65rem; margin-top: 3px;">🔄 You can retry any lesson unlimited times</p>
+                <p style="font-size:0.65rem; margin-top:3px;">🔄 You can retry any lesson unlimited times</p>
             </div>
+            <button onclick="startFirstLesson()" class="btn-main" style="width:100%; margin-top:5px;">🎮 START LESSON 1 →</button>
+        </div>
 
-
-
-<button onclick="startFirstLesson()" class="btn-main">🎮 START LESSON 1 →</button>
-
-<p style="font-size: 0.6rem; color: var(--text-dim); text-align: center; margin-top: 5px;">
-</p>
     </div>
 </div>
 
 <script>
     const lang = '{{ lang }}';
-    const urlParams = new URLSearchParams(window.location.search);
-    const isManual = urlParams.has('manual');  // true when opened from "View Intro" button
+    const isManual = new URLSearchParams(window.location.search).has('manual');
 
     function startFirstLesson() {
-        // Mark this language as "seen" so auto-intro won't show again
-        if (!isManual) {
-            localStorage.setItem(`intro_seen_${lang}`, 'true');
-        }
-
+        if (!isManual) localStorage.setItem(`intro_seen_${lang}`, 'true');
         const pending = sessionStorage.getItem('pendingLesson');
         if (pending) {
             const { language, lessonId, isRetry } = JSON.parse(pending);
             sessionStorage.removeItem('pendingLesson');
             window.location.href = `/lesson/${language}/${lessonId}` + (isRetry ? '?retry=true' : '');
         } else {
-            // No pending lesson – go to lesson 1 of this language
             window.location.href = `/lesson/${lang}/1`;
         }
     }
 
-    // Expose function globally
     window.startFirstLesson = startFirstLesson;
 
-    // Auth check for navbar
-    fetch('/check_auth').then(res => res.json()).then(data => {
-        if (data.logged_in) {
-            const authSection = document.getElementById('auth-section');
-            if (authSection) {
-                authSection.innerHTML = `
-                    <span class="user-info">
-                        <span class="welcome-text">👋 ${data.name}</span>
-                        <a href="/logout" class="logout-btn">Logout</a>
-                    </span>`;
-            }
+    fetch('/check_auth').then(r => r.json()).then(data => {
+        if (data.logged_in && document.getElementById('auth-section')) {
+            document.getElementById('auth-section').innerHTML =
+                `<span class="user-info"><span class="welcome-text">👋 ${data.name}</span><a href="/logout" class="logout-btn">Logout</a></span>`;
         }
     });
 
-    // Keyboard shortcut: Enter starts the lesson
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            startFirstLesson();
-        }
-    });
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') startFirstLesson(); });
 </script>
 </body>
 </html>

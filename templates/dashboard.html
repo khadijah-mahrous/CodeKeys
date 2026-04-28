@@ -3,166 +3,35 @@
 <head>
     <title>CodeKeys - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body {
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
-        }
-
-        .dashboard-wrapper {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-        }
-
-        .sidebar {
-            width: 260px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border-glass);
-            display: flex;
-            flex-direction: column;
-            padding: 30px 20px;
-        }
-
-        .nav-item {
-            color: var(--text-dim);
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            transition: 0.3s;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--accent-primary);
-            transform: translateX(5px);
-        }
-
-        .dashboard-content {
-            flex: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-        }
-
-        .header-card, .stat-box {
-            background: var(--bg-glass) !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-glass) !important;
-            border-radius: 20px;
-            padding: 25px;
-        }
-
-        .header-card h1 { color: var(--text-bright); margin: 0; }
-        .header-card p { color: var(--text-dim); margin-top: 10px; }
-
-        .progress-bar {
-            height: 8px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-            border-radius: 4px;
-            transition: width 1s ease-in-out;
-        }
-
-        .sidebar .logout-btn {
-            display: inline-flex;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .sidebar .nav-item {
-            margin: 2px 0;
-            padding: 10px 15px;
-        }
-
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        a {
-            text-decoration: none;
-        }
-
-        .accuracy-big {
-            font-size: 36px;
-            font-weight: bold;
-            color: #8b5cf6;
-        }
-        
-        .accuracy-label {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 10px;
-        }
-        
-        .lang-badge {
-            display: inline-block;
-            background: rgba(6, 182, 212, 0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-top: 8px;
-        }
-        
-        .target-note {
-            font-size: 11px;
-            color: #7f8c8d;
-            margin-top: 8px;
-        }
-        
-        .course-progress-bar {
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-        
-        .course-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-    </style>
 </head>
-<body>
+<body style="height:100vh; overflow:hidden; flex-direction:row;">
 
-<div class="dashboard-wrapper">
+<div class="sidebar-layout">
+    <!-- SIDEBAR -->
     <div class="sidebar">
-        <h2 style="color: #8b5cf6; margin-bottom: 30px;">  CodeKeys</h2>
-        <a href="/" style="text-decoration: none;"><div class="nav-item">🏠 HOME</div></a>
+        <div class="sidebar-logo" onclick="window.location.href='/'">CodeKeys</div>
+        <a href="/" style="text-decoration:none;"><div class="nav-item">🏠 HOME</div></a>
         <div class="nav-item active">📊 DASHBOARD</div>
-        <a href="/courses/python" style="text-decoration: none;"><div class="nav-item">📚 COURSES</div></a>
-        <a href="/statistics" style="text-decoration: none;"><div class="nav-item">📈 STATISTICS</div></a>
-        <a href="/achievements" style="text-decoration: none;"><div class="nav-item">🏆 ACHIEVEMENTS</div></a>
-        <a href="/settings" style="text-decoration: none;"><div class="nav-item">⚙️ SETTINGS</div></a>
-        
-        <div style="margin-top: auto; padding: 0 10px;">
-            <a href="/logout" class="logout-btn" style="width: auto; padding: 8px 20px; font-size: 0.75rem;">Logout</a>
+        <a href="/courses/python" style="text-decoration:none;"><div class="nav-item">📚 COURSES</div></a>
+        <a href="/statistics" style="text-decoration:none;"><div class="nav-item">📈 STATISTICS</div></a>
+        <a href="/achievements" style="text-decoration:none;"><div class="nav-item">🏆 ACHIEVEMENTS</div></a>
+        <a href="/settings" style="text-decoration:none;"><div class="nav-item">⚙️ SETTINGS</div></a>
+        <div class="sidebar-footer">
+            <a href="/logout" class="logout-btn">Logout</a>
         </div>
     </div>
 
-    <div class="dashboard-content">
+    <!-- MAIN CONTENT -->
+    <div class="sidebar-content">
         <div class="header-card">
-            <h1 style="margin:0;">👋 Welcome, {{ data.username }}!</h1><br>
-            
-            <span id="current-level" style="display: none;">{{ data.level }}</span>
-            
+            <h1>👋 Welcome, {{ data.username }}!</h1><br>
+            <span id="current-level" style="display:none;">{{ data.level }}</span>
             <div class="level-progress">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                     <span>Progress to Level <span id="next-level"></span></span>
                     <span id="progress-percent">0%</span>
                 </div>
-                <div class="progress-bar" id="progress-bar" style="width: 0%;"></div>
+                <div class="progress-bar" id="progress-bar" style="width:0%;"></div>
             </div>
         </div>
 
@@ -175,22 +44,22 @@
             </div>
         </div>
 
-        <div style="margin: 20px 0;">
-            <h3> Course Progress</h3>
-            <div style="display: grid; gap: 15px;">
+        <div style="margin:20px 0;">
+            <h3>Course Progress</h3>
+            <div style="display:grid; gap:15px; margin-top:15px;">
                 {% for lang_key, lang_info in languages.items() %}
                 {% set current_level = data.get(lang_key + '_level', 1) %}
                 {% set total_lessons = lesson_counts.get(lang_key, 10) %}
                 {% set progress_percent = (current_level / total_lessons * 100) | round(1) %}
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                         <span>{{ lang_info.icon }} {{ lang_info.name }}</span>
                         <span>Lesson {{ current_level }} / {{ total_lessons }}</span>
                     </div>
                     <div class="course-progress-bar">
-                        <div class="course-progress-fill" style="width: {{ progress_percent }}%;"></div>
+                        <div class="course-progress-fill" style="width:{{ progress_percent }}%;"></div>
                     </div>
-                    <div style="font-size: 11px; color: var(--text-dim); margin-top: 5px; text-align: right;">
+                    <div style="font-size:11px; color:var(--text-dim); margin-top:5px; text-align:right;">
                         {{ progress_percent }}% Complete
                     </div>
                 </div>
@@ -201,19 +70,15 @@
 </div>
 
 <script>
-    // Get total lessons for each language from server
     const lessonCounts = {{ lesson_counts|tojson }};
-    
     var currentLevel = parseInt(document.getElementById('current-level').innerText);
     var maxLevel = lessonCounts.basics || 43;
-    var progress = (currentLevel / maxLevel) * 100;
-    if (progress > 100) progress = 100;
-    
+    var progress = Math.min((currentLevel / maxLevel) * 100, 100);
+
     document.getElementById('next-level').innerHTML = currentLevel + 1;
     document.getElementById('progress-percent').innerHTML = Math.round(progress) + '%';
     document.getElementById('progress-bar').style.width = progress + '%';
-    
-    // Update best accuracy from server data
+
     if ({{ data.best_accuracy }} > 0) {
         document.getElementById('bestAccuracy').innerHTML = {{ data.best_accuracy }} + '%';
     }

@@ -3,169 +3,9 @@
 <head>
     <title>CodeKeys - {{ lang|capitalize }} Lesson</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            min-height: 100vh;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
-        }
-        .lesson-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 0 20px;
-            box-sizing: border-box;
-            overflow: auto;
-        }
-        .lesson-container h2 {
-            margin-bottom: 5px;
-            font-size: 1.5rem;
-        }
-        .editor-container {
-            width: 90%;
-            max-width: 800px;
-            background: rgba(10, 10, 12, 0.7) !important;
-            backdrop-filter: blur(15px);
-            border-radius: 12px;
-            border: 1px solid var(--border-glass);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            margin: 20px auto;
-            overflow-x: auto;
-            overflow-y: hidden;
-        }
-        .editor-body {
-            padding: 50px 40px !important;
-            position: relative;
-            text-align: left;
-            overflow-x: auto;
-            overflow-y: hidden;
-            min-height: 200px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-        }
-        .target-text {
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 1.5rem;
-            font-weight: 600 !important;
-            letter-spacing: 0.5px;
-            white-space: pre !important;
-            color: rgba(255, 255, 255, 0.3);
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .target-text span {
-            display: inline-block;
-            min-width: 0.6em;
-            transition: 0.1s;
-        }
-        .target-text span.current {
-            border-bottom: 3px solid var(--accent-secondary);
-            color: var(--text-bright);
-            background: rgba(139, 92, 246, 0.2);
-        }
-        .editor-body::-webkit-scrollbar {
-            height: 6px;
-        }
-        .editor-body::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-        }
-        .editor-body::-webkit-scrollbar-thumb {
-            background: var(--accent-primary);
-            border-radius: 3px;
-        }
-        #type-input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: default;
-            z-index: 2;
-        }
-        /* Add a fake cursor indicator */
-        .editor-body:focus-within::after {
-            content: '';
-            position: absolute;
-            width: 2px;
-            height: 1.5rem;
-            background: var(--accent-secondary);
-            animation: blink 1s infinite;
-            pointer-events: none;
-        }
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-        .target-text span.correct {
-            color: #2ecc71 !important;
-        }
-        .target-text span.wrong {
-            color: #e74c3c !important;
-            text-decoration: line-through;
-            text-decoration-thickness: 2px;
-        }
-        .progress-indicator {
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: var(--text-dim);
-        }
-        .progress-bar-container {
-            width: 90%;
-            max-width: 1000px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-            width: 0%;
-            transition: width 0.1s ease;
-        }
-        nav {
-            flex-shrink: 0;
-        }
-        body::-webkit-scrollbar {
-            display: none;
-        }
-        .teacher-note {
-            background: rgba(139, 92, 246, 0.1);
-            border-left: 3px solid var(--accent-primary);
-            padding: 12px 20px;
-            margin: 20px auto;
-            border-radius: 8px;
-            max-width: 800px;
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-        }
-        .note-icon {
-            font-size: 1.2rem;
-        }
-        .editor-header {
-            background: #161b22;
-            padding: 12px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-        }
-    </style>
 </head>
-<body>
+<body style="min-height:100vh; overflow-y:auto;">
+
 <nav>
     <div class="logo" onclick="window.location.href='/'">CodeKeys</div>
     <div class="nav-links">
@@ -176,7 +16,7 @@
     </div>
 </nav>
 
-<div class="lesson-container">
+<div class="lesson-page">
     <h2>Lesson {{ lesson.id }}: {{ lesson.title }}</h2>
     <div class="teacher-note">
         <span class="note-icon">💡</span>
@@ -184,12 +24,12 @@
     </div>
     <div class="editor-container">
         <div class="editor-header">
-            <div style="display: flex; gap: 8px; margin-right: 20px;">
-                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56;"></div>
-                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e;"></div>
-                <div style="width: 12px; height: 12px; border-radius: 50%; background: #27c93f;"></div>
+            <div style="display:flex; gap:8px; margin-right:20px;">
+                <div style="width:12px;height:12px;border-radius:50%;background:#ff5f56;"></div>
+                <div style="width:12px;height:12px;border-radius:50%;background:#ffbd2e;"></div>
+                <div style="width:12px;height:12px;border-radius:50%;background:#27c93f;"></div>
             </div>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8b949e;">{{ lang }}_module_{{ lesson.id }}.py</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#8b949e;">{{ lang }}_module_{{ lesson.id }}.py</span>
         </div>
 
         <div class="editor-body" id="editor-body" tabindex="0">
@@ -198,7 +38,8 @@
                     <span data-char="{{ char }}">{{ char }}</span>
                 {% endfor %}
             </div>
-            <textarea id="type-input" autofocus autocomplete="off" spellcheck="false" rows="4" style="width:100%; background:transparent; color:white; font-family:'JetBrains Mono', monospace; font-size:1.5rem; border:none; resize:none; outline:none; padding:0;"></textarea>
+            <textarea id="type-input" autofocus autocomplete="off" spellcheck="false" rows="4"
+                style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:default;z-index:2;background:transparent;color:white;font-family:'JetBrains Mono',monospace;font-size:1.5rem;border:none;resize:none;outline:none;padding:0;"></textarea>
         </div>
     </div>
 
@@ -214,35 +55,19 @@
     const input = document.getElementById('type-input');
     const displaySpans = document.querySelectorAll('#display-text span');
     const editorBody = document.getElementById('editor-body');
-
-    // Get the raw target text from the lesson
     const targetText = {{ lesson.target | tojson }};
-    
-    // Create array of characters from the target text
-    const targetChars = [];
-    for (let i = 0; i < targetText.length; i++) {
-        targetChars.push(targetText[i]);
-    }
-    
-    let startTime = null;
-    let completed = false;
-    let redirecting = false;
-    let mistakesCount = 0;
-    let mistakePositions = new Set();
+    const targetChars = Array.from(targetText);
+
+    let startTime = null, completed = false, redirecting = false;
+    let mistakesCount = 0, mistakePositions = new Set();
 
     function normalizeComparisonChar(char) {
-        // Normalize quotes for comparison
-        if (char === '"' || char === '"' || char === '"') return '"';
-        if (char === "'" || char === "'" || char === "'") return "'";
-        return char;
+        const map = { '\u2018': "'", '\u2019': "'", '\u201C': '"', '\u201D': '"' };
+        return map[char] || char;
     }
 
     function handleKeyPress(e) {
-        if (completed || redirecting) return;
-        
         const currentIndex = input.value.length;
-
-        // Handle Enter key for newlines
         if (e.key === 'Enter') {
             e.preventDefault();
             if (currentIndex < targetText.length && targetChars[currentIndex] === '\n') {
@@ -252,24 +77,12 @@
             }
             return;
         }
-
-        // Track mistakes at the current position
         if (currentIndex < targetText.length) {
-            const expectedChar = targetChars[currentIndex];
-            let pressedKey = e.key;
-            
-            // Handle special keys
-            if (pressedKey === 'Enter') pressedKey = '\n';
-            
-            // Normalize quotes for comparison
-            const normalizedExpected = normalizeComparisonChar(expectedChar);
+            let pressedKey = e.key === 'Enter' ? '\n' : e.key;
+            const normalizedExpected = normalizeComparisonChar(targetChars[currentIndex]);
             const normalizedPressed = normalizeComparisonChar(pressedKey);
-            
             if (normalizedPressed !== normalizedExpected && pressedKey.length === 1) {
-                if (!mistakePositions.has(currentIndex)) {
-                    mistakesCount++;
-                    mistakePositions.add(currentIndex);
-                }
+                if (!mistakePositions.has(currentIndex)) { mistakesCount++; mistakePositions.add(currentIndex); }
             }
         }
     }
@@ -277,199 +90,78 @@
     input.addEventListener('keydown', handleKeyPress);
 
     function updateProgress() {
-        const typed = input.value.length;
-        const progress = (typed / targetText.length) * 100;
-        const fill = document.getElementById('progress-fill');
-        const text = document.getElementById('progress-text');
-        if (fill) fill.style.width = progress + '%';
-        if (text) text.textContent = Math.round(progress) + '% complete';
-    }
-
-    function scrollToCurrent() {
-        const currentSpan = document.querySelector('.target-text span.current');
-        if (currentSpan) {
-            currentSpan.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-        }
+        const progress = (input.value.length / targetText.length) * 100;
+        document.getElementById('progress-fill').style.width = progress + '%';
+        document.getElementById('progress-text').textContent = Math.round(progress) + '% complete';
     }
 
     function updateHighlighting() {
         const typedValue = input.value;
-        
         for (let i = 0; i < displaySpans.length; i++) {
             const span = displaySpans[i];
             span.classList.remove('current', 'correct', 'wrong');
-            
             if (i < typedValue.length) {
-                // Compare characters
-                const typedChar = typedValue[i];
-                const expectedChar = targetChars[i];
-                
-                // Normalize both for comparison
-                const normalizedTyped = normalizeComparisonChar(typedChar);
-                const normalizedExpected = normalizeComparisonChar(expectedChar);
-                
-                if (normalizedTyped === normalizedExpected) {
-                    span.classList.add('correct');
-                } else {
-                    span.classList.add('wrong');
-                }
+                const n = normalizeComparisonChar;
+                span.classList.add(n(typedValue[i]) === n(targetChars[i]) ? 'correct' : 'wrong');
             } else if (i === typedValue.length) {
                 span.classList.add('current');
+                span.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
             }
         }
-        
         updateProgress();
-        scrollToCurrent();
     }
 
     async function completeLesson() {
         if (completed || redirecting) return;
-
-        completed = true;
-        redirecting = true;
-        
-        const endTime = new Date();
-        const duration = startTime ? (endTime - startTime) : 60000;
-        const timeInMinutes = duration / 60000;
-        
+        completed = redirecting = true;
+        const duration = startTime ? (new Date() - startTime) : 60000;
         const typedText = input.value;
-
-        // Calculate correct characters
         let correctChars = 0;
-        const minLength = Math.min(typedText.length, targetText.length);
-        
-        for (let i = 0; i < minLength; i++) {
-            const typedChar = typedText[i];
-            const targetChar = targetChars[i];
-            const normalizedTyped = normalizeComparisonChar(typedChar);
-            const normalizedTarget = normalizeComparisonChar(targetChar);
-            
-            if (normalizedTyped === normalizedTarget) {
-                correctChars++;
-            }
+        const n = normalizeComparisonChar;
+        for (let i = 0; i < Math.min(typedText.length, targetText.length); i++) {
+            if (n(typedText[i]) === n(targetChars[i])) correctChars++;
         }
-
-        // Calculate accuracy
-        let accuracy = Math.round((correctChars / targetText.length) * 100);
-        if (accuracy > 100) accuracy = 100;
-        if (accuracy < 0) accuracy = 0;
-
-        // Calculate WPM (5 chars = 1 word)
-        let wpm = Math.round((correctChars / 5) / timeInMinutes);
-        if (wpm < 0) wpm = 0;
-
-        console.log("Lesson Complete:", {
-            accuracy: accuracy,
-            wpm: wpm,
-            mistakes: mistakesCount,
-            typedLength: typedText.length,
-            targetLength: targetText.length,
-            correctChars: correctChars,
-            duration: duration
-        });
-
-        // Send to server and wait for response before redirecting
+        const accuracy = Math.min(100, Math.max(0, Math.round((correctChars / targetText.length) * 100)));
+        const wpm = Math.max(0, Math.round((correctChars / 5) / (duration / 60000)));
         try {
             const response = await fetch('/process_stats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    lang: "{{ lang }}",
-                    lesson_id: {{ lesson.id }},
-                    accuracy: accuracy,
-                    wpm: wpm,
-                    mistakes: mistakesCount,
-                    total_chars: targetText.length,
-                    typed_text: typedText
-                })
+                body: JSON.stringify({ lang: "{{ lang }}", lesson_id: {{ lesson.id }}, accuracy, wpm,
+                    mistakes: mistakesCount, total_chars: targetText.length, typed_text: typedText })
             });
-            
             const result = await response.json();
-            console.log("Server response:", result);
-            
-            // Only redirect after successful server response
-            if (result.status === 'success') {
-                window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
-            } else {
-                console.error("Server returned error:", result);
-                // Still try to redirect even if server had issues
-                window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
-            }
-        } catch (error) {
-            console.error("Error sending stats:", error);
-            // Still redirect to results page even if fetch fails
-            window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
-        }
+            if (result.status === 'success') window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
+            else window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
+        } catch { window.location.href = "/results/{{ lang }}/" + {{ lesson.id }}; }
     }
 
-    input.addEventListener('input', function(e) {
+    input.addEventListener('input', function() {
         if (completed || redirecting) return;
-        
-        // Start timer on first character
-        if (!startTime && input.value.length > 0) {
-            startTime = new Date();
-        }
-        
-        // Prevent typing beyond target length
-        if (input.value.length > targetText.length) {
-            input.value = input.value.slice(0, targetText.length);
-            return;
-        }
-        
+        if (!startTime && input.value.length > 0) startTime = new Date();
+        if (input.value.length > targetText.length) { input.value = input.value.slice(0, targetText.length); return; }
         updateHighlighting();
-        
-        // Check if lesson is complete
-        if (input.value.length === targetText.length) {
-            setTimeout(completeLesson, 150);
-        }
+        if (input.value.length === targetText.length) setTimeout(completeLesson, 150);
     });
 
-    // Reset function
     function resetLesson() {
-        input.value = '';
-        mistakesCount = 0;
-        mistakePositions.clear();
-        completed = false;
-        redirecting = false;
-        startTime = null;
-        updateHighlighting();
-        input.focus();
+        input.value = ''; mistakesCount = 0; mistakePositions.clear();
+        completed = redirecting = false; startTime = null;
+        updateHighlighting(); input.focus();
     }
 
-    // Initialize on page load
-    window.addEventListener('load', function() {
-        resetLesson();
-    });
+    window.addEventListener('load', resetLesson);
+    editorBody.addEventListener('click', () => input.focus());
+    document.addEventListener('keydown', e => { if (e.key === 'Tab' && document.activeElement === editorBody) { e.preventDefault(); input.focus(); } });
+    input.addEventListener('keydown', e => { if (e.key === 'Tab') { e.preventDefault(); input.focus(); } });
+    setTimeout(() => input.focus(), 100);
 
-    // Make sure the textarea stays focused
-    editorBody.addEventListener('click', function() {
-        input.focus();
-    });
-
-    // Also focus when tabbing
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab' && document.activeElement === editorBody) {
-            e.preventDefault();
-            input.focus();
+    fetch('/check_auth').then(r => r.json()).then(data => {
+        if (data.logged_in && document.getElementById('auth-section')) {
+            document.getElementById('auth-section').innerHTML =
+                `<span class="user-info"><span class="welcome-text">👋 ${data.name}</span><a href="/logout" class="logout-btn">Logout</a></span>`;
         }
     });
-
-    // Initial focus
-    setTimeout(() => {
-        input.focus();
-    }, 100);
-
-    // Handle tab key in textarea
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            input.focus();
-        }
-    });
-
-    // Debug logging
-    console.log("Target text:", targetText);
-    console.log("Target length:", targetText.length);
 </script>
 </body>
 </html>

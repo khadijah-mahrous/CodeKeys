@@ -3,221 +3,67 @@
 <head>
     <title>CodeKeys - Account Settings</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            min-height: 100vh;
-            overflow-y: auto;
-            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
-            display: flex;
-            flex-direction: column;
-        }
-        
-        nav {
-            flex-shrink: 0;
-        }
-        
-        .settings-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 20px;
-        }
-        
-        .settings-card {
-            width: 100%;
-            max-width: 500px;
-            background: var(--bg-glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 35px;
-        }
-        
-        .settings-header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-glass);
-        }
-        
-        .settings-header .icon {
-            font-size: 2.5rem;
-            display: block;
-            margin-bottom: 8px;
-        }
-        
-        .settings-header h2 {
-            font-size: 1.3rem;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-dim);
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            color: white;
-            font-size: 0.9rem;
-            transition: 0.3s;
-            box-sizing: border-box;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
-        }
-        
-        .form-group input:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .btn-save {
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            width: 100%;
-            padding: 12px;
-            font-size: 0.85rem;
-            margin-top: 10px;
-            border-radius: 12px;
-        }
-        
-        .btn-delete {
-            background: linear-gradient(135deg, #800020, #4a0404) !important;
-            width: 100%;
-            padding: 12px;
-            font-size: 0.85rem;
-            margin-top: 25px;
-        }
-        
-        .info-note {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            margin-top: 8px;
-            text-align: center;
-        }
-        
-        .info-note.warning {
-            color: #fbbf24;
-        }
-        
-        .divider {
-            margin: 20px 0;
-            border-top: 1px solid var(--border-glass);
-        }
-        
-        .toast-message {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #2ecc71;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
-            z-index: 100000;
-            animation: slideInRight 0.3s ease;
-            display: none;
-        }
-        
-        .toast-message.error {
-            background: #e74c3c;
-        }
-        
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        small {
-            display: block;
-            margin-top: 5px;
-            color: var(--text-dim);
-            font-size: 0.65rem;
-        }
-    </style>
 </head>
-<body>
+<body style="height:100vh; overflow:hidden; flex-direction:row;">
 
-<nav>
-    <div class="logo" onclick="window.location.href='/'">CodeKeys</div>
-    <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/dashboard">Dashboard</a>
-        <a href="/courses/python">Courses</a>
-        <a href="/statistics">Statistics</a>
-        <a href="/achievements">Achievements</a>
-        <a href="/settings" style="color: var(--accent-primary);">Settings</a>
-        <div id="auth-section"></div>
-    </div>
-</nav>
-
-<div class="settings-container">
-    <div class="settings-card">
-        <div class="settings-header">
-            <span class="icon">⚙️</span>
-            <h2>Account Settings</h2>
+<div class="sidebar-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-logo" onclick="window.location.href='/'">CodeKeys</div>
+        <a href="/" style="text-decoration:none;"><div class="nav-item">🏠 HOME</div></a>
+        <a href="/dashboard" style="text-decoration:none;"><div class="nav-item">📊 DASHBOARD</div></a>
+        <a href="/courses/python" style="text-decoration:none;"><div class="nav-item">📚 COURSES</div></a>
+        <a href="/statistics" style="text-decoration:none;"><div class="nav-item">📈 STATISTICS</div></a>
+        <a href="/achievements" style="text-decoration:none;"><div class="nav-item">🏆 ACHIEVEMENTS</div></a>
+        <div class="nav-item active">⚙️ SETTINGS</div>
+        <div class="sidebar-footer">
+            <a href="/logout" class="logout-btn">Logout</a>
         </div>
-        
-        <form id="settingsForm">
-            <!-- Change Name -->
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="fullName" value="{{ user.name }}" placeholder="Enter your name">
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="settings-wrapper">
+        <div class="settings-card card">
+            <div class="settings-header">
+                <span class="icon">⚙️</span>
+                <h2>Account Settings</h2>
             </div>
-            
-            <!-- Change Email (disabled - needs password) -->
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="email" value="{{ user.email }}" disabled>
-                <small>Email cannot be changed directly. Contact support to change email.</small>
-            </div>
-            
-            <!-- Change Password -->
-            <div class="form-group">
-                <label>Current Password</label>
-                <input type="password" id="currentPassword" placeholder="Enter current password">
-            </div>
-            
-            <div class="form-group">
-                <label>New Password</label>
-                <input type="password" id="newPassword" placeholder="Enter new password">
-            </div>
-            
-            <div class="form-group">
-                <label>Confirm New Password</label>
-                <input type="password" id="confirmPassword" placeholder="Confirm new password">
-            </div>
-            
-            <button type="submit" class="btn-main btn-save">💾 Save Changes</button>
-        </form>
-        
-        <div class="divider"></div>
-        
-        <!-- Delete Account -->
-        <button class="btn-main btn-delete" id="deleteAccountBtn">🗑️ Delete Account</button>
-        <div class="info-note warning">⚠️ This action cannot be undone</div>
+
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="fullName" value="{{ user.name }}" placeholder="Enter your name">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" value="{{ user.email }}" disabled>
+                    <small>Email cannot be changed directly. Contact support to change email.</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" placeholder="Enter current password">
+                </div>
+
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" placeholder="Enter new password">
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                </div>
+
+                <button type="submit" class="btn-main btn-save">💾 Save Changes</button>
+            </form>
+
+            <div class="divider"></div>
+
+            <button class="btn-main btn-delete" id="deleteAccountBtn">🗑️ Delete Account</button>
+            <div class="info-note warning">⚠️ This action cannot be undone</div>
+        </div>
     </div>
 </div>
 
@@ -229,180 +75,76 @@
         toast.textContent = message;
         toast.className = 'toast-message' + (isError ? ' error' : '');
         toast.style.display = 'block';
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 3000);
+        setTimeout(() => { toast.style.display = 'none'; }, 3000);
     }
-    
-    // Handle form submit
+
     document.getElementById('settingsForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
         const name = document.getElementById('fullName').value.trim();
         const currentPassword = document.getElementById('currentPassword').value;
         const newPassword = document.getElementById('newPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
-        
-        // التحقق من الاسم
-        if (!name) {
-            showToast('Name cannot be empty', true);
-            return;
-        }
-        
-        if (name.length < 2) {
-            showToast('Name must be at least 2 characters', true);
-            return;
-        }
-        
-        // إذا كان المستخدم يريد تغيير كلمة السر
+
+        if (!name || name.length < 2) { showToast('Name must be at least 2 characters', true); return; }
+
         if (newPassword || confirmPassword) {
-            if (!currentPassword) {
-                showToast('Current password is required to change password', true);
-                return;
-            }
-            
-            if (newPassword !== confirmPassword) {
-                showToast('New passwords do not match', true);
-                return;
-            }
-            
-            if (newPassword.length < 4) {
-                showToast('Password must be at least 4 characters', true);
-                return;
-            }
-            
-            // تغيير كلمة السر
+            if (!currentPassword) { showToast('Current password is required to change password', true); return; }
+            if (newPassword !== confirmPassword) { showToast('New passwords do not match', true); return; }
+            if (newPassword.length < 4) { showToast('Password must be at least 4 characters', true); return; }
             try {
-                const response = await fetch('/change_password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        current_password: currentPassword,
-                        new_password: newPassword
-                    })
+                const res = await fetch('/change_password', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
                 });
-                
-                const data = await response.json();
-                
-                if (!data.success) {
-                    showToast(data.message, true);
-                    return;
-                }
+                const data = await res.json();
+                if (!data.success) { showToast(data.message, true); return; }
                 showToast('Password changed successfully!');
                 document.getElementById('currentPassword').value = '';
                 document.getElementById('newPassword').value = '';
                 document.getElementById('confirmPassword').value = '';
-            } catch (error) {
-                showToast('An error occurred', true);
-                return;
-            }
+            } catch { showToast('An error occurred', true); return; }
         }
-        
-        // تغيير الاسم (يتطلب كلمة السر)
+
         if (name !== '{{ user.name }}') {
-            if (!currentPassword && !newPassword) {
-                showToast('Password is required to change name', true);
-                return;
-            }
-            
-            // نستخدم currentPassword اللي دخلها المستخدم
-            const passwordToUse = currentPassword || (await askForPassword());
-            
-            if (!passwordToUse) {
-                showToast('Password is required to change name', true);
-                return;
-            }
-            
+            const passwordToUse = currentPassword || await askForPassword();
+            if (!passwordToUse) { showToast('Password is required to change name', true); return; }
             try {
-                const response = await fetch('/change_name', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        new_name: name,
-                        password: passwordToUse
-                    })
+                const res = await fetch('/change_name', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ new_name: name, password: passwordToUse })
                 });
-                
-                const data = await response.json();
-                
+                const data = await res.json();
                 if (data.success) {
-                    document.getElementById('fullName').value = name;
                     showToast('Name changed successfully!');
-                    
-                    // تحديث الاسم في الناف بار
-                    const welcomeSpan = document.querySelector('.welcome-text');
-                    if (welcomeSpan) {
-                        welcomeSpan.textContent = `👋 ${name}`;
-                    }
-                } else {
-                    showToast(data.message, true);
-                    return;
-                }
-            } catch (error) {
-                showToast('An error occurred', true);
-                return;
-            }
-        }
-        
-        if (!newPassword && name === '{{ user.name }}') {
+                    setTimeout(() => location.reload(), 1500);
+                } else { showToast(data.message, true); }
+            } catch { showToast('An error occurred', true); }
+        } else if (!newPassword) {
             showToast('No changes were made', true);
-        } else {
-            // تحديث الصفحة بعد 1.5 ثانية
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
         }
     });
-    
+
     async function askForPassword() {
-        return new Promise((resolve) => {
-            const password = prompt('Please enter your password to confirm name change:');
-            resolve(password);
-        });
+        return new Promise(resolve => resolve(prompt('Please enter your password to confirm name change:')));
     }
-    
-    // Delete account
+
     document.getElementById('deleteAccountBtn').addEventListener('click', function() {
-        if (confirm('⚠️ WARNING: This will permanently delete your account and ALL your progress.\n\nAre you sure you want to delete your account?')) {
-            const confirmation = prompt('Type "DELETE" to confirm account deletion:');
-            if (confirmation === 'DELETE') {
-                fetch('/delete_account', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = '/';
-                    } else {
-                        showToast(data.message, true);
-                    }
-                })
-                .catch(error => {
-                    showToast('An error occurred', true);
-                });
+        if (confirm('⚠️ WARNING: This will permanently delete your account and ALL your progress.\n\nAre you sure?')) {
+            if (prompt('Type "DELETE" to confirm:') === 'DELETE') {
+                fetch('/delete_account', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) window.location.href = '/';
+                        else showToast(data.message, true);
+                    })
+                    .catch(() => showToast('An error occurred', true));
             }
         }
     });
-    
-    // Check auth
-    fetch('/check_auth')
-        .then(res => res.json())
-        .then(data => {
-            if (!data.logged_in) {
-                window.location.href = '/?login_required=settings';
-            } else {
-                const authSection = document.getElementById('auth-section');
-                if (authSection) {
-                    authSection.innerHTML = `
-                        <span class="user-info">
-                            <span class="welcome-text">👋 ${data.name}</span>
-                            <a href="/logout" class="logout-btn">Logout</a>
-                        </span>
-                    `;
-                }
-            }
-        });
+
+    fetch('/check_auth').then(res => res.json()).then(data => {
+        if (!data.logged_in) window.location.href = '/?login_required=settings';
+    });
 </script>
 </body>
 </html>
