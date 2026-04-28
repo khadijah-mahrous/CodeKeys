@@ -265,3 +265,30 @@ nav {
     filter: brightness(1.2);
     box-shadow: 0 0 10px rgba(128, 0, 32, 0.4);
 }
+.toast-message {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #2ecc71;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    z-index: 10000;
+    animation: slideInRight 0.3s ease;
+    display: none;
+}
+
+.toast-message.error {
+    background: #e74c3c;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
