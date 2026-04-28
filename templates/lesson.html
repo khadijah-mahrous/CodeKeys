@@ -94,6 +94,20 @@
             cursor: default;
             z-index: 2;
         }
+        /* Add a fake cursor indicator */
+        .editor-body:focus-within::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 1.5rem;
+            background: var(--accent-secondary);
+            animation: blink 1s infinite;
+            pointer-events: none;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
         .target-text span.correct {
             color: #2ecc71 !important;
         }
@@ -178,7 +192,7 @@
             <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8b949e;">{{ lang }}_module_{{ lesson.id }}.py</span>
         </div>
 
-        <div class="editor-body" id="editor-body">
+        <div class="editor-body" id="editor-body" tabindex="0">
             <div class="target-text" id="display-text">
                 {% for char in lesson.target %}
                     <span data-char="{{ char }}">{{ char }}</span>
@@ -202,7 +216,7 @@
     const editorBody = document.getElementById('editor-body');
 
     // Get the raw target text from the lesson
-    const targetText = "{{ lesson.target | safe }}";
+    const targetText = {{ lesson.target | tojson }};
     
     // Create array of characters from the target text
     const targetChars = [];
@@ -354,7 +368,7 @@
             duration: duration
         });
 
-        // Send to server
+        // Send to server and wait for response before redirecting
         try {
             const response = await fetch('/process_stats', {
                 method: 'POST',
@@ -372,12 +386,20 @@
             
             const result = await response.json();
             console.log("Server response:", result);
+            
+            // Only redirect after successful server response
+            if (result.status === 'success') {
+                window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
+            } else {
+                console.error("Server returned error:", result);
+                // Still try to redirect even if server had issues
+                window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
+            }
         } catch (error) {
             console.error("Error sending stats:", error);
+            // Still redirect to results page even if fetch fails
+            window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
         }
-
-        // Redirect to results page
-        window.location.href = "/results/{{ lang }}/" + {{ lesson.id }};
     }
 
     input.addEventListener('input', function(e) {
@@ -419,12 +441,25 @@
         resetLesson();
     });
 
-    // Refocus if user clicks anywhere on the editor
+    // Make sure the textarea stays focused
     editorBody.addEventListener('click', function() {
         input.focus();
     });
 
-    // Handle tab key
+    // Also focus when tabbing
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab' && document.activeElement === editorBody) {
+            e.preventDefault();
+            input.focus();
+        }
+    });
+
+    // Initial focus
+    setTimeout(() => {
+        input.focus();
+    }, 100);
+
+    // Handle tab key in textarea
     input.addEventListener('keydown', function(e) {
         if (e.key === 'Tab') {
             e.preventDefault();
