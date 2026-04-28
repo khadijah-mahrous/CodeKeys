@@ -1,204 +1,300 @@
-# Complete Python Programming Lessons from "What is Python.docx"
-
 PYTHON_LESSONS = [
+
+   
+    # ========== LEVEL 1: BASICS (Lessons 1–7) ==========
+
     {
         "id": 1,
         "title": "What is Python?",
-        "target": """print('Python was created by Guido van Rossum')""",
-        "instr": "Python is a popular programming language created by Guido van Rossum and released in 1991. It is used for web development (server-side), software development, mathematics, and system scripting."
+        "target": "print('Python was created by Guido van Rossum')",
+        "instr": "Python is a popular programming language created by Guido van Rossum and released in 1991."
     },
     {
         "id": 2,
         "title": "Why Python?",
-        "target": """print('Python has a simple syntax similar to English')""",
-        "instr": "Python works on different platforms including Windows, Mac, Linux, and Raspberry Pi. It has a simple syntax similar to the English language that allows developers to write programs with fewer lines than some other programming languages."
+        "target": "print('Python has a simple syntax similar to English')",
+        "instr": "Python works on many platforms and has simple syntax."
     },
     {
         "id": 3,
         "title": "The Interpreter System",
-        "target": """print('Python runs on an interpreter system')""",
-        "instr": "Python runs on an interpreter system, meaning that code can be executed as soon as it is written. This means that prototyping can be very quick."
+        "target": "print('Python runs on an interpreter system')",
+        "instr": "Python executes code line-by-line using an interpreter."
     },
     {
         "id": 4,
         "title": "Python Syntax",
-        "target": """if 5 > 2:
-    print('Five is greater than two!')""",
-        "instr": "Python uses new lines to complete a command, as opposed to other programming languages which often use semicolons or parentheses. Python relies on indentation using whitespace to define scope. The number of spaces is up to you, but it must be at least one. The most common use is four spaces."
+        "target": "if 5 > 2:\n    print('Five is greater than two!')",
+        "instr": "Python uses indentation to define code blocks."
     },
     {
         "id": 5,
         "title": "Python Statements",
-        "target": """print('Python is fun!')
-print('Hello World!')""",
-        "instr": "A computer program is a list of instructions to be executed by a computer. In a programming language, these programming instructions are called statements. In Python, a statement usually ends when the line ends. You do not need to use a semicolon like in many other programming languages."
+        "target": "print('Python is fun!')\nprint('Hello World!')",
+        "instr": "A statement is an instruction. Python ends statements by newline."
     },
     {
         "id": 6,
         "title": "Output and Quotes",
-        "target": """print("Double Quotes")
-print('Single Quotes')""",
-        "instr": "You can use the print() function to display text or output values. Each call prints text on a new line by default. Text in Python must be inside quotes. You can use either double quotes or single quotes."
+        "target": "print(\"Double Quotes\")\nprint('Single Quotes')",
+        "instr": "Text must be inside quotes. print() outputs text."
     },
     {
         "id": 7,
         "title": "Outputting Numbers",
-        "target": """print(358)
-print(3 + 3)
-print(2 * 5)""",
-        "instr": "You can also use the print() function to display numbers. However, unlike text, numbers are not put inside quotes. You can also do math inside the print() function."
+        "target": "print(358)\nprint(3 + 3)\nprint(2 * 5)",
+        "instr": "Numbers do not need quotes. You can do math inside print()."
     },
+
+    # ========== 📝 EXAM 1: After Level 7 ==========
+
     {
         "id": 8,
-        "title": "Mixing Text and Numbers",
-        "target": """print('I am', 35, 'years old.')""",
-        "instr": "You can combine text and numbers in one output by separating them with a comma."
+        "title": "📝 EXAM 1: Python Basics",
+        "is_exam": True,
+        "exam_number": 1,
+        "pass_score": 70,
+        "covers_lessons": "1-7",
+        "exam_type": "question",
+        "questions": [
+            {
+                "question": "Write Python code to print 'Hello World'",
+                "answer": "print('Hello World')"
+            },
+            {
+                "question": "Create a variable name='Razan' and print it",
+                "answer": "name = 'Razan'\nprint(name)"
+            },
+            {
+                "question": "Write code that prints the result of 5 + 10",
+                "answer": "print(5 + 10)"
+            },
+            {
+                "question": "Write code that prints both text and number in one line",
+                "answer": "print('Age:', 20)"
+            },
+            {
+                "question": "Write code that prints the second item in ['a','b','c']",
+                "answer": "lst = ['a','b','c']\nprint(lst[1])"
+            }
+        ]
     },
-    {
+
+    # ========== LEVEL 2: DATA TYPES & LISTS (Lessons 8–14) ==========
+{
         "id": 9,
-        "title": "Python Comments",
-        "target": """# This is a comment
-print('Comments are ignored')""",
-        "instr": "Comments can be used to explain Python code, make the code more readable, or prevent execution when testing code. Comments start with a #, and Python will ignore them."
+        "title": "Mixing Text and Numbers",
+        "target": "print('I am', 35, 'years old.')",
+        "instr": "You can mix text and numbers using commas."
     },
     {
         "id": 10,
-        "title": "Creating Variables",
-        "target": """x = 5
-y = 'John'
-print(x)
-print(y)""",
-        "instr": "Variables are containers for storing data values. Python has no command for declaring a variable. A variable is created the moment you first assign a value to it."
+        "title": "Python Comments",
+        "target": "# This is a comment\nprint('Comments are ignored')",
+        "instr": "Comments start with # and are ignored by Python."
     },
     {
         "id": 11,
-        "title": "Variable Naming Rules",
-        "target": """myvar = 'John'
-_my_var = 'John'
-myVar2 = 'John'""",
-        "instr": "Variable naming rules: A variable name must start with a letter or the underscore character. It cannot start with a number. It can only contain alpha-numeric characters and underscores. Variable names are case-sensitive (age, Age and AGE are three different variables). A variable name cannot be any of the Python keywords."
+        "title": "Creating Variables",
+        "target": "x = 5\ny = 'John'\nprint(x)\nprint(y)",
+        "instr": "Variables are created when assigned a value."
     },
     {
         "id": 12,
-        "title": "Assigning Multiple Values",
-        "target": """x, y, z = 'Orange', 'Banana', 'Cherry'
-print(x, y, z)""",
-        "instr": "Python allows you to assign values to multiple variables in one line. Make sure the number of variables matches the number of values, or else you will get an error."
+        "title": "Variable Naming Rules",
+        "target": "myvar = 'John'\n_my_var = 'John'\nmyVar2 = 'John'",
+        "instr": "Variable names must start with a letter or underscore."
     },
     {
         "id": 13,
-        "title": "Built-in Data Types",
-        "target": """x = 5
-print(type(x))
-y = 'Hello'
-print(type(y))""",
-        "instr": "In programming, data type is an important concept. Variables can store data of different types. Python has built-in data types including: Text Type (str), Numeric Types (int, float, complex), Sequence Types (list, tuple, range), Mapping Type (dict), Set Types (set, frozenset), Boolean Type (bool), Binary Types (bytes, bytearray, memoryview), and None Type (NoneType). You can get the data type of any object by using the type() function."
+        "title": "Assigning Multiple Values",
+        "target": "x, y, z = 'Orange', 'Banana', 'Cherry'\nprint(x, y, z)",
+        "instr": "You can assign multiple variables in one line."
     },
     {
         "id": 14,
-        "title": "Python Numbers",
-        "target": """x = 1
-y = 1.1
-z = -325""",
-        "instr": "There are three numeric types in Python: int (integers), float (floating point numbers with decimals), and complex."
+        "title": "Built-in Data Types",
+        "target": "x = 5\nprint(type(x))\ny = 'Hello'\nprint(type(y))",
+        "instr": "Python has many built-in data types."
     },
     {
         "id": 15,
-        "title": "Multiline Strings",
-        "target": """a = '''Lorem ipsum dolor sit amet,
-consectetur adipiscing elit'''
-print(a)""",
-        "instr": "You can assign a multiline string to a variable by using three quotes. You can use either three double quotes or three single quotes."
+        "title": "Python Numbers",
+        "target": "x = 1\ny = 1.1\nz = -325",
+        "instr": "Python has int, float, and complex numbers."
     },
+
+    # ========== 📝 EXAM 2: After Level 14 ==========
+
     {
         "id": 16,
-        "title": "Boolean Evaluation",
-        "target": """print(10 > 9)
-print(10 == 9)
-print(10 < 9)""",
-        "instr": "Booleans represent one of two values: True or False. When you compare two values, the expression is evaluated and Python returns the Boolean answer. When you run a condition in an if statement, Python returns True or False."
+        "title": "📝 EXAM 2: Data Types & Variables",
+        "is_exam": True,
+        "exam_number": 2,
+        "pass_score": 75,
+        "covers_lessons": "8-14",
+        "exam_type": "question",
+        "questions": [
+            {
+                "question": "Create variables a=10, b='Hello' and print both",
+                "answer": "a = 10\nb = 'Hello'\nprint(a, b)"
+            },
+            {
+                "question": "Write code to check the type of 3.14",
+                "answer": "print(type(3.14))"
+            },
+            {
+                "question": "Assign x='A', y='B', z='C' in one line",
+                "answer": "x, y, z = 'A', 'B', 'C'"
+            },
+            {
+                "question": "Write a comment in Python",
+                "answer": "# This is a comment"
+            },
+            {
+                "question": "Write code to print the third item in ['red','green','blue']",
+                "answer": "colors = ['red','green','blue']\nprint(colors[2])"
+            }
+        ]
     },
+
+    # ========== LEVEL 3: LISTS & LOOPS (Lessons 15–21) ==========
+
     {
         "id": 17,
-        "title": "Arithmetic Operators",
-        "target": """x = 15
-y = 4
-print(x + y)
-print(x % y)
-print(x ** y)""",
-        "instr": "Operators are used to perform operations on variables and values. Arithmetic operators include: + (addition), - (subtraction), * (multiplication), / (division), % (modulus/remainder), ** (exponentiation), and // (floor division)."
+        "title": "Multiline Strings",
+        "target": "a = '''Hello\nWorld'''\nprint(a)",
+        "instr": "Triple quotes allow multiline strings."
     },
     {
         "id": 18,
-        "title": "The Walrus Operator",
-        "target": """numbers = [1, 2, 3, 4, 5]
-if (n := len(numbers)) > 3:
-    print(n)""",
-        "instr": "Python 3.8 introduced the := operator, known as the walrus operator. It assigns values to variables as part of a larger expression."
+        "title": "Boolean Evaluation",
+        "target": "print(10 > 9)\nprint(10 == 9)\nprint(10 < 9)",
+        "instr": "Booleans return True or False."
     },
     {
         "id": 19,
-        "title": "Python Lists",
-        "target": """thislist = ['apple', 'banana', 'cherry']
-print(thislist)
-print(thislist[1])""",
-        "instr": "Lists are used to store multiple items in a single variable. Lists are one of 4 built-in data types in Python used to store collections of data. Since lists are indexed, lists can have items with the same value. The first item has index 0."
+        "title": "Arithmetic Operators",
+        "target": "x = 15\ny = 4\nprint(x + y)\nprint(x % y)\nprint(x ** y)",
+        "instr": "Python supports many arithmetic operators."
     },
     {
         "id": 20,
-        "title": "Add and Remove List Items",
-        "target": """thislist = ['apple', 'banana']
-thislist.append('orange')
-thislist.remove('apple')""",
-        "instr": "To add an item to the end of the list, use the append() method. To insert a list item at a specified index, use the insert() method. The remove() method removes the specified item. The pop() method removes the specified index, or removes the last item if no index is specified."
+        "title": "The Walrus Operator",
+        "target": "numbers = [1, 2, 3, 4, 5]\nif (n := len(numbers)) > 3:\n    print(n)",
+        "instr": "The := operator assigns inside expressions."
     },
     {
         "id": 21,
-        "title": "Sorting Lists",
-        "target": """thislist = [100, 50, 65]
-thislist.sort()
-thislist.sort(reverse=True)""",
-        "instr": "List objects have a sort() method that will sort the list alphanumerically, ascending, by default. To sort descending, use the keyword argument reverse = True."
+        "title": "Python Lists",
+        "target": "thislist = ['apple', 'banana', 'cherry']\nprint(thislist)\nprint(thislist[1])",
+        "instr": "Lists store multiple items."
     },
     {
         "id": 22,
-        "title": "If and Elif Statements",
-        "target": """a = 33
-b = 33
-if b > a:
-    print('b is greater than a')
-elif a == b:
-    print('a and b are equal')""",
-"instr": "The elif keyword is Python's way of saying 'if the previous conditions were not true, then try this condition'. Python supports equality (a == b), inequality (a != b), less than (a < b), less than or equal to (a <= b), greater than (a > b), and greater than or equal to (a >= b). You can have as many elif statements as you need."
+        "title": "Add and Remove List Items",
+        "target": "thislist = ['apple', 'banana']\nthislist.append('orange')\nthislist.remove('apple')",
+        "instr": "append() adds, remove() deletes."
     },
     {
         "id": 23,
-        "title": "While Loops",
-        "target": """i = 1
-while i < 6:
-    print(i)
-    i += 1""",
-        "instr": "With the while loop we can execute a set of statements as long as a condition is true. Remember to increment your variable, or else the loop will continue forever."
+        "title": "Sorting Lists",
+        "target": "thislist = [100, 50, 65]\nthislist.sort()\nthislist.sort(reverse=True)",
+        "instr": "sort() arranges items ascending or descending."
+    },
+# ========== 📝 EXAM 3: After Level 21 ==========
+
+    {
+        "id": 24,
+        "title": "📝 EXAM 3: Lists & Operators",
+        "is_exam": True,
+        "exam_number": 3,
+        "pass_score": 80,
+        "covers_lessons": "15-21",
+        "exam_type": "question",
+        "questions": [
+            {
+                "question": "Write code to append 'kiwi' to a list fruits",
+                "answer": "fruits.append('kiwi')"
+            },
+            {
+                "question": "Write code to sort [3,1,2] ascending",
+                "answer": "lst = [3,1,2]\nlst.sort()"
+            },
+            {
+                "question": "Write code to print True if 5 > 2",
+                "answer": "print(5 > 2)"
+            },
+            {
+                "question": "Write code to print the length of [1,2,3]",
+                "answer": "print(len([1,2,3]))"
+            },
+            {
+                "question": "Write code to remove 'apple' from ['apple','banana']",
+                "answer": "lst = ['apple','banana']\nlst.remove('apple')"
+            }
+        ]
     },
 
-   {
-    "id": 24,
-    "title": "Loop Control: Break",
-    "target": """i = 1
-while i < 6:
-    if i == 3:
-        break
-    print(i)
-    i += 1""",
-    "instr": "With the break statement we can stop the loop even if the while condition is true. With the continue statement we can stop the current iteration and continue with the next."
-},
+    # ========== LEVEL 4: EXTRA LESSONS TO REACH LEVEL 28 ==========
+
+    {
+        "id": 25,
+        "title": "If and Elif Statements",
+        "target": "a = 33\nb = 33\nif b > a:\n    print('b is greater')\nelif a == b:\n    print('equal')",
+        "instr": "elif checks another condition."
+    },
     {
         "id": 26,
+        "title": "While Loops",
+        "target": "i = 1\nwhile i < 6:\n    print(i)\n    i += 1",
+        "instr": "while repeats while condition is true."
+    },
+    {
+        "id": 27,
+        "title": "Loop Control: Break",
+        "target": "i = 1\nwhile i < 6:\n    if i == 3:\n        break\n    print(i)\n    i += 1",
+        "instr": "break stops the loop."
+    },
+    {
+        "id": 28,
         "title": "Defining Functions",
-        "target": """def my_function():
-    print('Hello from a function')
+        "target": "def my_function():\n    print('Hello')\nmy_function()",
+        "instr": "Functions run only when called."
+    },
 
-my_function()""",
-        "instr": "A function is a block of code which only runs when it is called. A function can return data as a result. A function helps avoid code repetition. In Python, a function is defined using the def keyword, followed by a function name and parentheses. The code inside the function must be indented."
+    # ========== 📝 EXAM 4: After Level 28 ==========
+
+    {
+        "id": 29,
+        "title": "📝 FINAL EXAM 4: Python Level 28",
+        "is_exam": True,
+        "exam_number": 4,
+        "pass_score": 85,
+        "covers_lessons": "22-28",
+        "exam_type": "question",
+        "questions": [
+            {
+                "question": "Write a function called greet() that prints 'Hello'",
+                "answer": "def greet():\n    print('Hello')"
+            },
+            {
+                "question": "Write a while loop that prints numbers 1 to 3",
+                "answer": "i = 1\nwhile i <= 3:\n    print(i)\n    i += 1"
+            },
+            {
+                "question": "Write code that breaks a loop when i == 5",
+                "answer": "if i == 5:\n    break"
+            },
+            {
+                "question": "Write an if/elif statement that prints 'Match' if x==10",
+                "answer": "if x == 10:\n    print('Match')"
+            },
+            {
+                "question": "Write code to sort ['b','a','c']",
+                "answer": "lst = ['b','a','c']\nlst.sort()"
+            }
+        ]
     }
+
 ]
