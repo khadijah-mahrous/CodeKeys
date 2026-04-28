@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CodeKeys - Statistics Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stats-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 30px;
+        }
+        
+        .stats-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .stats-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+        .stats-container::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .page-header p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        
+        .lang-tabs {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .lang-tab {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 8px 22px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .lang-tab.active {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-color: transparent;
+        }
+        .lang-tab:hover:not(.active) {
+            background: rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 10px;
+        }
+        .chart-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 18px;
+            transition: 0.3s;
+        }
+        .chart-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+        .chart-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            color: var(--accent-primary);
+        }
+        .chart-title-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .history-btn {
+            background: rgba(139, 92, 246, 0.2);
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            color: var(--accent-primary);
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.3s;
+        }
+        .history-btn:hover {
+            background: rgba(139, 92, 246, 0.4);
+        }
+        .chart-container {
+            height: 200px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-glass);
+        }
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+        .improvement-up {
+            color: #2ecc71;
+        }
+        .improvement-down {
+            color: #e74c3c;
+        }
+        
+        .empty-chart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: var(--text-dim);
+            flex-direction: column;
+        }
+        .empty-chart span {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+        .empty-chart p {
+            font-size: 0.8rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #1a1a2e;
+            padding: 25px;
+            border-radius: 20px;
+            width: 550px;
+            max-width: 90%;
+            max-height: 75%;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+        @keyframes modalSlideIn {
+            from { transform: translateY(-40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .close-modal-btn {
+            background: none !important;
+            border: none !important;
+            color: #bbb !important;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+            padding: 10px;
+        }
+        .close-modal-btn:hover {
+            color: #e74c3c !important;
+        }
+        .history-item {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 0;
+        }
+        .history-date {
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+        }
+        .history-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 6px;
+            font-size: 0.8rem;
+        }
+        
+        @media (max-width: 900px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .stats-container {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo" onclick="window.location.href='/'">CodeKeys</div>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/courses/python">Courses</a>
+        <a href="/statistics" style="color: var(--accent-primary);">Statistics</a>
+        <div id="auth-section">
+            <span class="user-info">
+                <span class="welcome-text">👋 {{ username }}</span>
+                <a href="/logout" class="logout-btn">Logout</a>
+            </span>
+        </div>
+    </div>
+</nav>
+
+<div class="stats-container">
+    <div class="page-header">
+        <h1> Performance Analytics Dashboard</h1>
+        <p>Speed & Accuracy Analytics</p>
+    </div>
+
+    <div class="lang-tabs" id="langTabs">
+        {% for lang_key, lang_data in languages_data.items() %}
+        <div class="lang-tab {% if loop.first %}active{% endif %}" data-lang="{{ lang_key }}">
+            <span>{{ lang_data.icon }}</span>
+            <span>{{ lang_data.name }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% for lang_key, lang_data in languages_data.items() %}
+    <div class="lang-charts" id="charts-{{ lang_key }}" style="display: {% if loop.first %}block{% else %}none{% endif %};">
+        
+        <div class="charts-grid">
+            <!-- WPM Progress Chart - Daily Speed for Last 7 Days -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <div class="chart-title-left">
+                         Daily Typing Speed (Last 7 Days)
+                    </div>
+                    <button class="history-btn" onclick="showWPMHistory('{{ lang_key }}', '{{ lang_data.name }}')">
+                        📜 Full History
+                    </button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="wpm-chart-{{ lang_key }}"></canvas>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value {% if lang_data.weekly and lang_data.weekly.wpm_improvement >= 0 %}improvement-up{% else %}improvement-down{% endif %}">
+                            {% if lang_data.weekly and lang_data.weekly.wpm_improvement != 0 %}
+                                {{ "%.1f"|format(lang_data.weekly.wpm_improvement) }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </div>
+                        <div class="stat-label">Weekly Change</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            {% if lang_data.weekly and lang_data.weekly.best_wpm %}
+                                {{ lang_data.weekly.best_wpm }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </div>
+                        <div class="stat-label">Peak Speed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            {% if lang_data.avg_wpm %}
+                                {{ lang_data.avg_wpm }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </div>
+                        <div class="stat-label">Weekly Avg</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lesson Scores History -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <div class="chart-title-left">
+                        <span>📚</span> Recent Lesson Scores
+                    </div>
+                </div>
+                <div class="chart-container">
+                    {% if lang_data.lesson_history and lang_data.lesson_history|length > 0 %}
+                        <canvas id="scores-chart-{{ lang_key }}"></canvas>
+                    {% else %}
+                        <div class="empty-chart">
+                            <span>📖</span>
+                            <p>No lessons yet</p>
+                            <p style="font-size: 0.7rem;">Complete your first lesson</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            {% if lang_data.lesson_history %}
+                                {{ lang_data.lesson_history|length }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </div>
+                        <div class="stat-label">Lessons Done</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            {% if lang_data.lesson_history %}
+                                {% set total = namespace(value=0) %}
+                                {% for l in lang_data.lesson_history %}
+                                    {% set total.value = total.value + l.score %}
+                                {% endfor %}
+                                {{ (total.value / lang_data.lesson_history|length)|round(1) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </div>
+                        <div class="stat-label">Avg Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            {% if lang_data.lesson_history %}
+                                {% set best = namespace(value=0) %}
+                                {% for l in lang_data.lesson_history %}
+                                    {% if l.score > best.value %}
+                                        {% set best.value = l.score %}
+                                    {% endif %}
+                                {% endfor %}
+                                {{ best.value }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </div>
+                        <div class="stat-label">Best Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal for WPM History -->
+<div id="wpmHistoryModal" class="modal">
+    <div class="modal-content">
+        <h2 style="color: #8b5cf6; margin-bottom: 15px; font-size: 1.3rem;">📜 WPM History - <span id="historyLangName"></span></h2>
+        <div id="wpmHistoryContent">
+            <p style="color: var(--text-dim); text-align: center;">Loading...</p>
+        </div>
+        <button onclick="closeWPMHistoryModal()" class="close-modal-btn">Close</button>
+    </div>
+</div>
+
+<script>
+    // أيام الأسبوع - نبدأ من الأحد (Sunday)
+    const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+    // الحصول على التاريخ الحالي
+    const today = new Date();
+    
+    // دالة للحصول على اسم اليوم من التاريخ
+    function getDayName(date) {
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        return days[date.getDay()];
+    }
+    
+    // بناء الأيام السبعة الماضية مع أسمائها
+    function getLast7Days() {
+        const days = [];
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(today.getDate() - i);
+            days.push({
+                date: date.toISOString().slice(0, 10),
+                dayName: getDayName(date),
+                fullDate: date
+            });
+        }
+        return days;
+    }
+    
+    const last7Days = getLast7Days();
+    const orderedDays = last7Days.map(d => d.dayName);
+    const orderedDates = last7Days.map(d => d.date);
+    
+    console.log("📅 Last 7 days:", orderedDays);
+    console.log("📅 Dates:", orderedDates);
+    
+    // Language switching
+    const tabs = document.querySelectorAll('.lang-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            const lang = tab.dataset.lang;
+            document.querySelectorAll('.lang-charts').forEach(charts => {
+                charts.style.display = 'none';
+            });
+            document.getElementById(`charts-${lang}`).style.display = 'block';
+        });
+    });
+
+    // Show WPM History Modal
+    function showWPMHistory(langKey, langName) {
+        document.getElementById('historyLangName').textContent = langName;
+        document.getElementById('wpmHistoryModal').style.display = 'flex';
+        
+        fetch(`/get_wpm_history/${langKey}`)
+            .then(res => res.json())
+            .then(data => {
+                const content = document.getElementById('wpmHistoryContent');
+                if (data.history && data.history.length > 0) {
+                    let html = '';
+                    for (let item of data.history) {
+                        html += `
+                            <div class="history-item">
+                                <div class="history-date">📅 ${item.date}</div>
+                                <div class="history-stats">
+                                    <span>⚡ ${item.avg_wpm} WPM</span>
+                                    <span>🎯 ${item.avg_accuracy}%</span>
+                                    <span>📝 ${item.total_chars} chars</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = '<p style="color: var(--text-dim); text-align: center;">No WPM history yet. Complete lessons to see your progress!</p>';
+                }
+            })
+            .catch(error => {
+                console.error("Error loading history:", error);
+                document.getElementById('wpmHistoryContent').innerHTML = '<p style="color: var(--text-dim); text-align: center;">Error loading history.</p>';
+            });
+    }
+    
+    function closeWPMHistoryModal() {
+        document.getElementById('wpmHistoryModal').style.display = 'none';
+    }
+    
+    window.onclick = function(event) {
+        const modal = document.getElementById('wpmHistoryModal');
+        if (event.target === modal) {
+            closeWPMHistoryModal();
+        }
+    }
+
+    // Initialize charts for each language
+    {% for lang_key, lang_data in languages_data.items() %}
+        
+        // Create array for 7 days with 0 values
+        let dailyWpm{{ lang_key }} = [0, 0, 0, 0, 0, 0, 0];
+        
+        {% if lang_data.weekly and lang_data.weekly.weekly_data %}
+            // Create a map of date to WPM
+            const wpmMap{{ lang_key }} = {};
+            const weeklyData{{ lang_key }} = {{ lang_data.weekly.weekly_data|tojson }};
+            
+            console.log("Weekly data for {{ lang_key }}:", weeklyData{{ lang_key }});
+            
+            for (let item of weeklyData{{ lang_key }}) {
+                wpmMap{{ lang_key }}[item.date] = item.avg_wpm;
+            }
+            
+            // Fill dailyWpm array based on ordered dates
+            for (let i = 0; i < orderedDates.length; i++) {
+                if (wpmMap{{ lang_key }}[orderedDates[i]]) {
+                    dailyWpm{{ lang_key }}[i] = wpmMap{{ lang_key }}[orderedDates[i]];
+                }
+            }
+            
+            console.log("Daily WPM for {{ lang_key }}:", dailyWpm{{ lang_key }});
+        {% endif %}
+        
+        // WPM Chart
+        new Chart(document.getElementById('wpm-chart-{{ lang_key }}'), {
+            type: 'line',
+            data: {
+                labels: orderedDays,
+                datasets: [{
+                    label: 'Daily WPM',
+                    data: dailyWpm{{ lang_key }},
+                    borderColor: '#06b6d4',
+                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: '#8b5cf6',
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { 
+                        labels: { color: '#fff', font: { size: 11 } },
+                        position: 'top'
+                    },
+                    tooltip: { 
+                        backgroundColor: '#1a1a2e', 
+                        titleColor: '#fff', 
+                        bodyColor: '#ccc',
+                        callbacks: {
+                            label: function(context) {
+                                return `Speed: ${context.raw} WPM`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { 
+                        title: { display: true, text: 'Words Per Minute (WPM)', color: '#fff', font: { size: 10 } },
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: { color: '#fff', font: { size: 10 } }
+                    },
+                    x: { 
+                        title: { display: true, text: 'Day of Week', color: '#fff', font: { size: 10 } },
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: { color: '#fff', font: { size: 10 } }
+                    }
+                }
+            }
+        });
+        
+        {% if lang_data.lesson_history and lang_data.lesson_history|length > 0 %}
+            const lessonHistory{{ lang_key }} = {{ lang_data.lesson_history|tojson }};
+            const lessonIds{{ lang_key }} = lessonHistory{{ lang_key }}.map(l => `L${l.lesson_id}`);
+            const lessonScores{{ lang_key }} = lessonHistory{{ lang_key }}.map(l => l.score);
+            const lessonWpm{{ lang_key }} = lessonHistory{{ lang_key }}.map(l => l.wpm);
+            
+            new Chart(document.getElementById('scores-chart-{{ lang_key }}'), {
+                type: 'bar',
+                data: {
+                    labels: lessonIds{{ lang_key }},
+                    datasets: [
+                        {
+                            label: 'Score %',
+                            data: lessonScores{{ lang_key }},
+                            backgroundColor: 'rgba(139, 92, 246, 0.7)',
+                            borderRadius: 6,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'WPM',
+                            data: lessonWpm{{ lang_key }},
+                            backgroundColor: 'rgba(6, 182, 212, 0.7)',
+                            borderRadius: 6,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { 
+                            labels: { color: '#fff', font: { size: 11 } },
+                            position: 'top'
+                        },
+                        tooltip: { backgroundColor: '#1a1a2e' }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Score %', color: '#fff', font: { size: 10 } },
+                            min: 0,
+                            max: 100,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#fff', font: { size: 10 } }
+                        },
+                        y1: {
+                            position: 'right',
+                            title: { display: true, text: 'WPM', color: '#fff', font: { size: 10 } },
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#fff', font: { size: 10 } }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#fff', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        {% endif %}
+        
+    {% endfor %}
+    
+    // Debug: Print all data
+    console.log("=== Statistics Page Loaded ===");
+    console.log("Today:", today.toISOString().slice(0, 10));
+    console.log("Ordered days:", orderedDays);
+    console.log("Ordered dates:", orderedDates);
+</script>
+</body>
+</html>

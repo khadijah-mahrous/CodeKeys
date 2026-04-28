@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CodeKeys - {{ lesson.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-deep));
+        }
+        
+        nav {
+            flex-shrink: 0;
+        }
+        
+        .exam-container {
+            flex: 1;
+            max-width: 1200px;
+            width: 95%;
+            margin: 20px auto;
+            padding: 0 20px 40px 20px;
+        }
+        
+        .exam-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .exam-header h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+        
+        .exam-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .info-badge {
+            background: rgba(139, 92, 246, 0.2);
+            padding: 6px 18px;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .top-bar {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .timer {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            color: var(--accent-secondary);
+            font-weight: bold;
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0,0,0,0.3);
+            display: inline-block;
+            padding: 8px 25px;
+            border-radius: 40px;
+        }
+        
+        .progress-info {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            background: rgba(0,0,0,0.2);
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 30px;
+            margin-left: 15px;
+        }
+        
+        /* Question Card - عرض كامل */
+        .question-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: 0.3s;
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .question-card.answered-correct {
+            border-left: 4px solid #2ecc71;
+            background: rgba(46, 204, 113, 0.05);
+        }
+        
+        .question-card.answered-wrong {
+            border-left: 4px solid #e74c3c;
+            background: rgba(231, 76, 60, 0.05);
+        }
+        
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            padding: 5px 16px;
+            border-radius: 25px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 18px;
+            width: fit-content;
+        }
+        
+        .question-text {
+            font-size: 1rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+            background: rgba(0,0,0,0.3);
+            padding: 18px;
+            border-radius: 12px;
+            font-family: monospace;
+            line-height: 1.5;
+            color: var(--text-bright);
+            width: 100%;
+        }
+        
+        .answer-area {
+            margin-bottom: 18px;
+            flex: 1;
+            width: 100%;
+        }
+        
+        .answer-area label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--accent-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 140px;
+            transition: 0.3s;
+        }
+        
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0 15px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        
+        .btn-show-answer {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid var(--accent-primary);
+            padding: 10px 22px;
+            border-radius: 10px;
+            color: var(--accent-primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        
+        .btn-show-answer:hover {
+            background: rgba(139, 92, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-check {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid #2ecc71;
+            padding: 10px 22px;
+            border-radius: 10px;
+            color: #2ecc71;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        
+        .btn-check:hover {
+            background: rgba(46, 204, 113, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .answer-display {
+            display: none;
+            margin-top: 15px;
+            padding: 18px;
+            background: rgba(46, 204, 113, 0.1);
+            border-left: 3px solid #2ecc71;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            width: 100%;
+        }
+        
+        .answer-display.show {
+            display: block;
+        }
+        
+        .answer-display strong {
+            color: #2ecc71;
+        }
+        
+        .answer-display pre {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        
+        .question-status {
+            margin-top: auto;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+        
+        .status-correct {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+        
+        .status-wrong {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        
+        .status-unanswered {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+        }
+        
+        .exam-footer {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            padding: 14px 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 12px;
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo" onclick="window.location.href='/'">CodeKeys</div>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/courses/{{ lang }}">Courses</a>
+        <div id="auth-section"></div>
+    </div>
+</nav>
+
+<div class="exam-container">
+    <div class="exam-header">
+        <h1>{{ lesson.title }}</h1>
+        <div class="exam-info">
+            <span class="info-badge"> Covers: Lessons {{ lesson.covers_lessons }}</span>
+            <span class="info-badge">Pass: {{ lesson.pass_score }}%</span>
+            <span class="info-badge">{{ lesson.questions|length }} Questions</span>
+        </div>
+    </div>
+
+    <div class="top-bar">
+        <div class="timer" id="timer"> Time: 00:00</div>
+        <div class="progress-info" id="progress-info"> Answered: 0 / {{ lesson.questions|length }} |  Correct: 0</div>
+    </div>
+
+    <form id="exam-form">
+        {% for q in lesson.questions %}
+        <div class="question-card" data-qid="{{ loop.index0 }}" id="question-{{ loop.index0 }}">
+            <div class="question-number">Question {{ loop.index }}</div>
+            <div class="question-text">
+                <span style="color: var(--accent-primary);"></span> {{ q.question }}
+            </div>
+            <div class="answer-area">
+                <label>Your Answer (Code):</label>
+                <textarea class="answer-input" name="q{{ loop.index0 }}" rows="4" placeholder="Write your code here..."></textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn-show-answer" onclick="toggleAnswer(this)">🔍 Show Answer</button>
+                <button type="button" class="btn-check" onclick="checkSingleAnswer(this, {{ loop.index0 }})">✓ Check Answer</button>
+            </div>
+            <div class="answer-display" id="answer-{{ loop.index0 }}">
+                <strong>Sample Correct Answer:</strong>
+                <pre>{{ q.answer }}</pre>
+            </div>
+            <div class="question-status status-unanswered" id="status-{{ loop.index0 }}">
+                ⏳ Not answered yet
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+
+    <div class="exam-footer">
+        <button onclick="submitExam()" class="btn-main btn-submit" id="submitBtn"> Submit Exam →</button>
+    </div>
+</div>
+
+<script>
+    const examLanguage = '{{ lang }}';
+    
+    // Check if questions exist
+    {% if lesson.questions %}
+        const questionsData = {{ lesson.questions|tojson }};
+        const totalQuestions = questionsData.length;
+    {% else %}
+        const questionsData = [];
+        const totalQuestions = 0;
+        console.error("No questions found for this exam");
+        alert("Error: This exam has no questions. Please contact support.");
+    {% endif %}
+    
+    let startTime = Date.now();
+    let timerInterval;
+    let userAnswers = {};
+    let questionStatus = {};
+    let questionCorrect = {};
+    let correctCount = 0;
+    let answeredCount = 0;
+    
+    let allTypedText = '';
+    let lastTypedLength = 0;
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            let elapsed = Math.floor((Date.now() - startTime) / 1000);
+            let minutes = Math.floor(elapsed / 60);
+            let seconds = elapsed % 60;
+            document.getElementById('timer').innerHTML = 
+                `⏱️ Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+    startTimer();
+
+    function toggleAnswer(btn) {
+        const answerDiv = btn.closest('.question-card').querySelector('.answer-display');
+        answerDiv.classList.toggle('show');
+    }
+
+    function normalizeAnswer(answer) {
+        return answer
+            .trim()
+            .replace(/\s+/g, ' ')
+            .replace(/;\s*$/g, '')
+            .replace(/["']/g, '"')
+            .replace(/\s*{\s*/g, '{')
+            .replace(/\s*}\s*/g, '}')
+            .replace(/\s*\(\s*/g, '(')
+            .replace(/\s*\)\s*/g, ')')
+            .replace(/\s*\[\s*/g, '[')
+            .replace(/\s*\]\s*/g, ']')
+            .replace(/\s*=>\s*/g, '=>')
+            .replace(/\s*=\s*/g, '=')
+            .replace(/\s*\+\s*/g, '+')
+            .replace(/\s*-\s*/g, '-')
+            .replace(/\s*\*\s*/g, '*')
+            .replace(/\s*\/\s*/g, '/')
+            .replace(/\s*,\s*/g, ',')
+            .toLowerCase();
+    }
+
+    function containsRequiredCode(userCode, correctCode) {
+        const normalizedUser = normalizeAnswer(userCode);
+        const normalizedCorrect = normalizeAnswer(correctCode);
+        
+        if (normalizedUser === normalizedCorrect) {
+            return true;
+        }
+        
+        const correctParts = normalizedCorrect.split('\n');
+        let matchCount = 0;
+        
+        for (let part of correctParts) {
+            if (part.length > 3) {
+                if (normalizedUser.includes(part)) {
+                    matchCount++;
+                } else {
+                    const partWithoutVar = part.replace(/[a-zA-Z_][a-zA-Z0-9_]*/g, '___');
+                    const userWithoutVar = normalizedUser.replace(/[a-zA-Z_][a-zA-Z0-9_]*/g, '___');
+                    if (userWithoutVar.includes(partWithoutVar)) {
+                        matchCount++;
+                    }
+                }
+            }
+        }
+        
+        const matchPercentage = correctParts.length > 0 ? matchCount / correctParts.length : 1;
+        return matchPercentage >= 0.6;
+    }
+
+    function checkSingleAnswer(btn, questionIndex) {
+        if (!questionsData[questionIndex]) {
+            console.error("Question not found");
+            return;
+        }
+        
+        const input = document.querySelector(`textarea[name="q${questionIndex}"]`);
+        const userAnswer = input ? input.value : '';
+        const correctAnswer = questionsData[questionIndex].answer;
+        
+        if (!userAnswer.trim()) {
+            const statusDiv = document.getElementById(`status-${questionIndex}`);
+            statusDiv.innerHTML = '⚠️ Please write your answer first!';
+            statusDiv.className = 'question-status status-wrong';
+            return;
+        }
+        
+        const isCorrect = containsRequiredCode(userAnswer, correctAnswer);
+        
+        const statusDiv = document.getElementById(`status-${questionIndex}`);
+        const questionCard = document.getElementById(`question-${questionIndex}`);
+        
+        if (isCorrect) {
+            if (!questionCorrect[questionIndex]) {
+                correctCount++;
+            }
+            statusDiv.innerHTML = '✅ Correct! Great job! ✓✓✓';
+            statusDiv.className = 'question-status status-correct';
+            questionCard.classList.add('answered-correct');
+            questionCard.classList.remove('answered-wrong');
+            questionCorrect[questionIndex] = true;
+        } else {
+            if (questionCorrect[questionIndex]) {
+                correctCount--;
+            }
+            statusDiv.innerHTML = '❌ Incorrect. Check the answer above and try again!';
+            statusDiv.className = 'question-status status-wrong';
+            questionCard.classList.add('answered-wrong');
+            questionCard.classList.remove('answered-correct');
+            questionCorrect[questionIndex] = false;
+        }
+        
+        if (userAnswer.trim()) {
+            if (!questionStatus[questionIndex]) {
+                answeredCount++;
+                questionStatus[questionIndex] = true;
+            }
+        }
+        
+        updateProgress();
+    }
+
+    function updateProgress() {
+        document.getElementById('progress-info').innerHTML = 
+            `📝 Answered: ${answeredCount} / ${totalQuestions} | ✅ Correct: ${correctCount}`;
+    }
+
+    function trackTyping() {
+        let currentText = '';
+        document.querySelectorAll('.answer-input').forEach((input) => {
+            currentText += input.value + ' ';
+        });
+        
+        if (currentText.length > lastTypedLength) {
+            allTypedText = currentText;
+            lastTypedLength = currentText.length;
+        }
+    }
+
+    // Only set up event listeners if questions exist
+    {% if lesson.questions %}
+    document.querySelectorAll('.answer-input').forEach((input, index) => {
+        input.addEventListener('input', function() {
+            trackTyping();
+            
+            const statusDiv = document.getElementById(`status-${index}`);
+            if (statusDiv && !statusDiv.classList.contains('status-correct') && !statusDiv.classList.contains('status-wrong')) {
+                statusDiv.innerHTML = '⏳ Click "Check Answer" to verify';
+                statusDiv.className = 'question-status status-unanswered';
+            }
+            
+            if (this.value.trim()) {
+                if (!questionStatus[index]) {
+                    answeredCount++;
+                    questionStatus[index] = true;
+                }
+            } else {
+                if (questionStatus[index]) {
+                    answeredCount--;
+                    questionStatus[index] = false;
+                    if (questionCorrect[index]) {
+                        correctCount--;
+                        questionCorrect[index] = false;
+                    }
+                }
+            }
+            updateProgress();
+        });
+    });
+    {% endif %}
+
+    async function submitExam() {
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').textContent = 'Submitting...';
+        
+        clearInterval(timerInterval);
+        const endTime = Date.now();
+        const durationMinutes = (endTime - startTime) / 60000;
+        
+        let totalTypedChars = 0;
+        document.querySelectorAll('.answer-input').forEach((input) => {
+            totalTypedChars += input.value.length;
+        });
+        
+        let wpm = Math.round((totalTypedChars / 5) / durationMinutes);
+        if (wpm < 0) wpm = 0;
+        if (isNaN(wpm) || !isFinite(wpm)) wpm = 0;
+        
+        let finalCorrect = 0;
+        for (let i = 0; i < totalQuestions; i++) {
+            if (questionCorrect[i] === undefined) {
+                const input = document.querySelector(`textarea[name="q${i}"]`);
+                const userAnswer = input ? input.value : '';
+                const correctAnswer = questionsData[i].answer;
+                if (userAnswer.trim() && containsRequiredCode(userAnswer, correctAnswer)) {
+                    finalCorrect++;
+                    questionCorrect[i] = true;
+                }
+            } else if (questionCorrect[i]) {
+                finalCorrect++;
+            }
+        }
+        
+        let accuracy = Math.round((finalCorrect / totalQuestions) * 100);
+        if (accuracy > 100) accuracy = 100;
+        if (accuracy < 0) accuracy = 0;
+        
+        let mistakes = totalQuestions - finalCorrect;
+        
+        try {
+            const response = await fetch('/process_exam_stats', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    lang: "{{ lang }}",
+                    lesson_id: {{ lesson.id }},
+                    accuracy: accuracy,
+                    wpm: wpm,
+                    mistakes: mistakes,
+                    total_chars: totalTypedChars,
+                    duration_minutes: durationMinutes
+                })
+            });
+            
+            const result = await response.json();
+            window.location.href = `/results/{{ lang }}/{{ lesson.id }}?accuracy=${accuracy}&wpm=${wpm}&mistakes=${mistakes}&total_chars=${totalTypedChars}`;
+            
+        } catch (error) {
+            console.error("Error submitting exam:", error);
+            window.location.href = `/results/{{ lang }}/{{ lesson.id }}?accuracy=${accuracy}&wpm=${wpm}&mistakes=${mistakes}`;
+        }
+    }
+
+    updateProgress();
+
+    fetch('/check_auth').then(res => res.json()).then(data => {
+        if (!data.logged_in) {
+            window.location.href = '/?login_required=exam';
+        } else {
+            const authSection = document.getElementById('auth-section');
+            if (authSection) {
+                authSection.innerHTML = `
+                    <span class="user-info">
+                        <span class="welcome-text">👋 ${data.name}</span>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </span>
+                `;
+            }
+        }
+    });
+</script>
+</body>
+</html>
