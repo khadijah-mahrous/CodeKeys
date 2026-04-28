@@ -29,8 +29,7 @@ BASICS_LESSONS = [
     {"id": 12, "title": "Home Row: Both Pinkies (A & ;)", "target": "a; a; a; ;a a;a; ;aa;", "instr": "🔁 BOTH PINKIES | Alternate A and ;", "finger": "both_pinky", "row": "home"},
     
     # Home Row Exam
-    {"id": 13, "title": "📝 HOME ROW EXAM", "target": "asdf jkl; fdsa ;lkj a;sldkfj fjak ls;d", "instr": "🎯 EXAM: Type the entire home row sequence. 80% accuracy required to pass.", "is_exam": True, "pass_score": 80, "row": "home"},
-    
+    {"id": 13, "title": "📝 HOME ROW EXAM", "target": "asdf jkl; fdsa ;lkj a;sldkfj fjak ls;d", "instr": "🎯 EXAM: Type the entire home row sequence. 80% accuracy required to pass.", "is_exam": True, "pass_score": 80, "exam_number": 1, "covers_lessons": "1-12"},
     # ========== TOP ROW ==========
     # Left index (r)
     {"id": 14, "title": "Top Row: Left Index (R)", "target": "rrrr rrrr rrrr", "instr": "🟢 INDEX LEFT (TOP) | Reach up from F to R. Return to F after each key.", "finger": "left_index", "row": "top"},
@@ -61,8 +60,7 @@ BASICS_LESSONS = [
     {"id": 25, "title": "Top Row: Both Pinkies (Q & P)", "target": "qp pq qpqp pqpq", "instr": "🔁 BOTH PINKIES (TOP) | Alternate Q and P.", "finger": "both_pinky", "row": "top"},
     
     # Top Row Exam
-    {"id": 26, "title": "📝 TOP ROW EXAM", "target": "qwertyuiop qazwsxedc rfvbnmju", "instr": "🎯 EXAM: Type the full top row. 80% accuracy required to pass.", "is_exam": True, "pass_score": 80, "row": "top"},
-    
+   {"id": 26, "title": "📝 TOP ROW EXAM", "target": "qwertyuiop qazwsxedc rfvbnmju", "instr": "🎯 EXAM: Type the full top row. 80% accuracy required to pass.", "is_exam": True, "pass_score": 80, "exam_number": 2, "covers_lessons": "14-25"},
     # ========== BOTTOM ROW ==========
     # Left index (v)
     {"id": 27, "title": "Bottom Row: Left Index (V)", "target": "vvvv vvvv vvvv", "instr": "🟢 INDEX LEFT (BOTTOM) | Reach down from F to V.", "finger": "left_index", "row": "bottom"},
@@ -93,13 +91,12 @@ BASICS_LESSONS = [
     {"id": 38, "title": "Bottom Row: Both Pinkies (Z & .)", "target": "z. .z z.z. .z.z", "instr": "🔁 BOTH PINKIES (BOTTOM) | Alternate Z and period.", "finger": "both_pinky", "row": "bottom"},
     
     # Bottom Row Exam
-    {"id": 39, "title": "📝 BOTTOM ROW EXAM", "target": "zxcvbnm zxcvbnm mnbvcxz zx./,mnb", "instr": "🎯 EXAM: Type the bottom row. 80% accuracy required to pass.", "is_exam": True, "pass_score": 80, "row": "bottom"},
-    
+   {"id": 39, "title": "📝 BOTTOM ROW EXAM", "target": "zxcvbnm zxcvbnm mnbvcxz zx./,mnb", "instr": "🎯 EXAM: Type the bottom row. 80% accuracy required to pass.", "is_exam": True, "pass_score": 80, "exam_number": 3, "covers_lessons": "27-38"},
     # ========== NUMBERS & SYMBOLS ==========
     {"id": 40, "title": "Numbers Row (1-0)", "target": "1234567890 1234567890", "instr": "🔢 NUMBERS | Reach up and left from home row. Keep fingers curved.", "row": "numbers"},
     {"id": 41, "title": "Symbols with Shift", "target": "!@#$%^&*() !@#$%^&*()", "instr": "✨ SYMBOLS | Use left/right Shift keys. Practice each symbol.", "row": "symbols"},
     {"id": 42, "title": "Mixed Punctuation", "target": ".,!?;: '\"() []{} <>", "instr": "📌 PUNCTUATION | Type all common punctuation marks.", "row": "punctuation"},
     
     # Final Exam
-    {"id": 43, "title": "🎓 FINAL TYPING EXAM", "target": "The quick brown fox jumps over the lazy dog. 12345!@#$% qwertyuiop[] asdfghjkl;' zxcvbnm,./", "instr": "🏆 FINAL TEST: Type the full pangram, numbers, symbols, and all rows. 85% accuracy required to pass.", "is_exam": True, "pass_score": 85, "row": "final"}
+     {"id": 43, "title": "🎓 FINAL TYPING EXAM", "target": "The quick brown fox jumps over the lazy dog. 12345!@#$% qwertyuiop[] asdfghjkl;' zxcvbnm,./", "instr": "🏆 FINAL TEST: Type the full pangram, numbers, symbols, and all rows. 85% accuracy required to pass.", "is_exam": True, "pass_score": 85, "exam_number": 4, "covers_lessons": "1-42"},
 ]
