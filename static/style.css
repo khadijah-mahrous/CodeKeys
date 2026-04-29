@@ -1,9 +1,8 @@
 /* ============================================================
-   CODEKEYS — MASTER STYLESHEET
-   All component styles consolidated here.
+   CODEKEYS — MASTER STYLESHEET (CLEANED)
+   All component styles consolidated, duplicates removed.
    ============================================================ */
 
-/* ── Google Fonts (loaded via HTML if needed) ── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;800&display=swap');
 
 /* ============================================================
@@ -44,7 +43,7 @@ a {
 }
 
 /* ============================================================
-   TOP NAVIGATION (index, lesson, result, intro, exam pages)
+   TOP NAVIGATION
    ============================================================ */
 nav {
     flex-shrink: 0;
@@ -116,8 +115,7 @@ nav {
 }
 
 /* ============================================================
-   SIDEBAR LAYOUT (dashboard, courses, achievements,
-                   statistics, settings)
+   SIDEBAR LAYOUT
    ============================================================ */
 .sidebar-layout {
     display: flex;
@@ -174,7 +172,6 @@ nav {
     padding: 0 10px;
 }
 
-/* Main content area inside sidebar layout */
 .sidebar-content {
     flex: 1;
     overflow-y: auto;
@@ -185,7 +182,7 @@ nav {
 }
 
 /* ============================================================
-   GLASS CARDS
+   GLASS CARDS (global)
    ============================================================ */
 .card,
 .lesson-node,
@@ -262,7 +259,7 @@ button:hover {
 }
 
 /* ============================================================
-   COURSE PATH TABS  (courses.html)
+   COURSE PATH TABS
    ============================================================ */
 .course-nav {
     display: flex;
@@ -728,6 +725,7 @@ button:hover {
 .empty-chart span { font-size: 2.5rem; margin-bottom: 8px; }
 .empty-chart p    { font-size: 0.8rem; }
 
+/* Statistics Modal */
 .modal {
     display: none;
     position: fixed;
@@ -754,20 +752,6 @@ button:hover {
     from { transform: translateY(-40px); opacity: 0; }
     to   { transform: translateY(0);     opacity: 1; }
 }
-
-.close-modal-btn {
-    background: none !important;
-    border: none !important;
-    color: #bbb !important;
-    margin-top: 15px;
-    cursor: pointer;
-    font-size: 14px;
-    width: 100%;
-    padding: 10px !important;
-    box-shadow: none !important;
-}
-
-.close-modal-btn:hover { color: #e74c3c !important; }
 
 .history-item {
     border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -1443,7 +1427,7 @@ button:hover {
 pre { white-space: pre-wrap; word-break: break-all; font-family: monospace; }
 
 /* ============================================================
-   TEACHER NOTE (lesson + style.css global)
+   TEACHER NOTE
    ============================================================ */
 .teacher-note {
     background: rgba(6, 182, 212, 0.1);
@@ -1493,8 +1477,9 @@ pre { white-space: pre-wrap; word-break: break-all; font-family: monospace; }
 }
 
 .result-wrapper div:first-child { animation: pulse 2s infinite ease-in-out; }
+
 /* ============================================================
-   INDEX PAGE SPECIFIC STYLES (moved from inline)
+   INDEX PAGE SPECIFIC STYLES (scoped to .card-section)
    ============================================================ */
 .hero {
     flex: 0 1 auto;
@@ -1522,7 +1507,8 @@ pre { white-space: pre-wrap; word-break: break-all; font-family: monospace; }
     align-items: stretch;
 }
 
-.card {
+/* Index page cards – only inside .card-section */
+.card-section .card {
     background: var(--bg-glass);
     backdrop-filter: blur(10px);
     border: 1px solid var(--border-glass);
@@ -1536,23 +1522,53 @@ pre { white-space: pre-wrap; word-break: break-all; font-family: monospace; }
     overflow: hidden;
 }
 
-.card:hover {
+.card-section .card:hover {
     transform: translateY(-8px);
     border-color: var(--accent-primary);
     box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
 }
 
-.card .course-btn {
+.card-section .card .course-btn {
     margin-top: auto;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-.card img {
+.card-section .card .course-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+}
+
+.card-section .card h3 {
+    margin: 15px 0 10px;
+    font-size: 1.4rem;
+}
+
+.card-section .card p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin: 10px 0;
+    line-height: 1.4;
+}
+
+.card-section .card .card-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.card-section .card img {
     width: 50px;
     height: 50px;
     margin: 0 auto;
 }
 
-/* Authentication Modal */
+/* Authentication Modal (index.html) */
 #authModal {
     display: none;
     position: fixed;
@@ -1574,11 +1590,6 @@ pre { white-space: pre-wrap; word-break: break-all; font-family: monospace; }
     text-align: center;
     position: relative;
     animation: modalSlideIn 0.3s ease;
-}
-
-@keyframes modalSlideIn {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
 }
 
 .auth-form {
@@ -1635,19 +1646,6 @@ pre { white-space: pre-wrap; word-break: break-all; font-family: monospace; }
     font-size: 12px;
     margin-top: 5px;
     display: none;
-}
-
-.user-info {
-    color: white;
-    margin-left: 25px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.welcome-text {
-    font-size: 14px;
-    color: #8b5cf6;
 }
 
 .success-message {
@@ -1711,40 +1709,4 @@ pre { white-space: pre-wrap; word-break: break-all; font-family: monospace; }
 
 .continue-btn {
     margin-top: 20px;
-}
-
-/* Additional card improvements */
-.card .course-btn {
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-top: 20px;
-}
-
-.card .course-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
-}
-
-.card h3 {
-    margin: 15px 0 10px;
-    font-size: 1.4rem;
-}
-
-.card p {
-    font-size: 0.85rem;
-    color: var(--text-dim);
-    margin: 10px 0;
-    line-height: 1.4;
-}
-
-/* Better card icons */
-.card .card-icon {
-    font-size: 3rem;
-    margin-bottom: 10px;
 }
