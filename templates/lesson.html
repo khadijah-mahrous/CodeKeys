@@ -39,10 +39,6 @@
             </div>
             <textarea id="type-input" autofocus autocomplete="off" spellcheck="false" rows="4"
                 style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:default;z-index:2;background:transparent;color:white;font-family:'JetBrains Mono',monospace;font-size:1.5rem;border:none;resize:none;outline:none;padding:0;"></textarea>
-            <!-- AI Hint Box -->
-            <div id="ai-hint" style="position: absolute; bottom: 10px; right: 20px; font-size: 0.7rem; background: rgba(0,0,0,0.7); padding: 5px 12px; border-radius: 20px; color: #8b5cf6; font-family: monospace; z-index: 10; backdrop-filter: blur(4px);">
-                🤖 AI suggests: <span id="ai-prediction">?</span>
-            </div>
         </div>
     </div>
 
@@ -114,37 +110,6 @@
         updateProgress();
     }
 
-    // AI Prediction
-    let lastContext = '';
-    async function updateAIPrediction() {
-        const typed = input.value;
-        if (typed.length >= 2) {
-            const context = typed.slice(-2);
-            if (context === lastContext) return;
-            lastContext = context;
-            try {
-                const response = await fetch(`/predict_next?context=${encodeURIComponent(context)}`);
-                const data = await response.json();
-                const predictionSpan = document.getElementById('ai-prediction');
-                if (data.prediction && data.confidence > 0) {
-                    let displayChar = data.prediction;
-                    if (displayChar === '\n') displayChar = '↵ (newline)';
-                    else if (displayChar === ' ') displayChar = '␣ (space)';
-                    predictionSpan.innerHTML = `${displayChar} (${data.confidence}%)`;
-                    predictionSpan.style.color = '#2ecc71';
-                } else {
-                    predictionSpan.innerHTML = '?';
-                    predictionSpan.style.color = '#a1a1aa';
-                }
-            } catch (err) {
-                console.error('AI prediction error', err);
-            }
-        } else {
-            document.getElementById('ai-prediction').innerHTML = 'type 2+ chars...';
-            document.getElementById('ai-prediction').style.color = '#a1a1aa';
-        }
-    }
-
     async function completeLesson() {
         if (completed || redirecting) return;
         completed = redirecting = true;
@@ -175,16 +140,13 @@
         if (!startTime && input.value.length > 0) startTime = new Date();
         if (input.value.length > targetText.length) { input.value = input.value.slice(0, targetText.length); return; }
         updateHighlighting();
-        updateAIPrediction();  // Call AI every keystroke
         if (input.value.length === targetText.length) setTimeout(completeLesson, 150);
     });
 
     function resetLesson() {
         input.value = ''; mistakesCount = 0; mistakePositions.clear();
         completed = redirecting = false; startTime = null;
-        updateHighlighting();
-        updateAIPrediction();
-        input.focus();
+        updateHighlighting(); input.focus();
     }
 
     window.addEventListener('load', resetLesson);
