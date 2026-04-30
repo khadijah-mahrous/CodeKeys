@@ -3,13 +3,14 @@ from functools import wraps
 import json
 import difflib
 import os
+from datetime import datetime  # ADDED for statistics
 from utils.text_normalizer import calculate_accuracy, normalize_code
 from database import get_db, init_db, save_user, get_user, get_user_by_id, get_user_progress, update_user_progress, get_lesson_score, save_lesson_score, get_all_scores
 from database import *
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here_change_this_12345'
-app.permanent_session_lifetime = 3600  # Session lasts 1 hour
+app.permanent_session_lifetime = 3600
 
 # Initialize database
 init_db()
@@ -31,6 +32,63 @@ lessons_db = {
     "javascript": JAVASCRIPT_LESSONS,
     "java": JAVA_LESSONS
 }
+
+# ========== AI: Character Prediction Model (Markov Chain) ==========
+from collections import defaultdict
+
+class CharPredictor:
+    """Order-2 Markov chain predictor for next character based on previous two."""
+    def __init__(self):
+        self.model = defaultdict(lambda: defaultdict(int))
+        self.total_lessons_trained = 0
+    
+    def train(self, text):
+        if len(text) < 3:
+            return
+        for i in range(len(text) - 2):
+            context = text[i:i+2]
+            next_char = text[i+2]
+            self.model[context][next_char] += 1
+    
+    def train_all(self, lessons_db):
+        count = 0
+        for lang, lessons in lessons_db.items():
+            for lesson in lessons:
+                if not lesson.get('is_exam'):  # only normal lessons (avoid exam instructions)
+                    target = lesson.get('target', '')
+                    if target:
+                        self.train(target)
+                        count += 1
+        self.total_lessons_trained = count
+        print(f"✅ AI predictor trained on {count} lessons across all languages.")
+    
+    def predict(self, context):
+        if len(context) != 2:
+            return None
+        if context in self.model:
+            next_chars = self.model[context]
+            return max(next_chars, key=next_chars.get)
+        return None
+    
+    def predict_with_fallback(self, context):
+        pred = self.predict(context)
+        if pred is not None:
+            return pred
+        # Fallback: use only last character (order-1)
+        if len(context) >= 1:
+            last_char = context[-1]
+            order1 = defaultdict(int)
+            for ctx, nxt_dict in self.model.items():
+                if ctx[1] == last_char:
+                    for nxt, cnt in nxt_dict.items():
+                        order1[nxt] += cnt
+            if order1:
+                return max(order1, key=order1.get)
+        return None
+
+# Create and train AI predictor
+ai_predictor = CharPredictor()
+ai_predictor.train_all(lessons_db)
 
 # Language metadata
 LANGUAGE_INFO = {
@@ -71,12 +129,34 @@ def normalize_text(text):
 def calculate_accuracy_fixed(user_input, target):
     """Calculate exact character-by-character accuracy"""
     from database import calculate_accuracy_exact, normalize_code_for_comparison
-    
     user_input = normalize_code_for_comparison(user_input.strip())
     target = normalize_code_for_comparison(target.strip())
-    
     accuracy, mistakes, correct = calculate_accuracy_exact(user_input, target)
     return accuracy
+
+# ========== Routes ==========
+
+@app.route('/predict_next')
+def predict_next():
+    """AI endpoint: given 'context' (last 2 chars), return predicted next character."""
+    context = request.args.get('context', '')
+    if len(context) != 2:
+        return jsonify({"prediction": None, "confidence": 0})
+    
+    pred = ai_predictor.predict_with_fallback(context)
+    if pred is None:
+        return jsonify({"prediction": None, "confidence": 0})
+    
+    # Calculate confidence if context exists in model
+    if context in ai_predictor.model:
+        total = sum(ai_predictor.model[context].values())
+        count = ai_predictor.model[context].get(pred, 0)
+        confidence = round((count / total) * 100) if total > 0 else 0
+    else:
+        # fallback confidence
+        confidence = 30  # low confidence for fallback
+    
+    return jsonify({"prediction": pred, "confidence": confidence})
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -185,6 +265,7 @@ def dashboard():
                          data=user_data, 
                          languages=LANGUAGE_INFO, 
                          lesson_counts=lesson_counts)
+
 @app.route('/')
 def index():
     return render_template('index.html', languages=LANGUAGE_INFO)
@@ -271,6 +352,7 @@ def exam(language, lesson_id):
                              lang=language, 
                              lesson=current_lesson,
                              lang_info=LANGUAGE_INFO.get(language, {}))
+
 @app.route('/get_next_lesson/<language>')
 def get_next_lesson(language):
     if 'user_id' not in session:
@@ -386,7 +468,7 @@ def process_exam_stats():
     lang = data.get('lang', 'javascript')
     lesson_id = int(data.get('lesson_id'))
     accuracy = int(data.get('accuracy', 0))
-    wpm = int(data.get('wpm', 0))  # الحصول على WPM من البيانات
+    wpm = int(data.get('wpm', 0))
     mistakes = int(data.get('mistakes', 0))
     total_chars = int(data.get('total_chars', 0))
     
@@ -425,6 +507,7 @@ def process_exam_stats():
     
     session.modified = True
     return jsonify({"status": "success", "accuracy": accuracy, "wpm": wpm})
+
 @app.route('/results/<language>/<int:lesson_id>')
 def results(language, lesson_id):
     user_id = session.get('user_id')
@@ -582,13 +665,6 @@ def statistics():
             'lesson_history': lesson_history[:5]  # Last 5 lessons
         }
     
-    # Get overall weekly progress
-    all_weekly = []
-    for day in range(7):
-        date = datetime.now().strftime('%Y-%m-%d')
-        # Simplified for demo
-        all_weekly.append({'day': day, 'wpm': 0, 'accuracy': 0})
-    
     return render_template('statistics.html',
                          username=user['name'] if user else 'User',
                          languages_data=languages_data,
@@ -614,6 +690,7 @@ def save_typing_stats_route():
     print(f"✅ Saved typing stats: {lang} - WPM: {wpm}, Accuracy: {accuracy}%")
     
     return jsonify({"status": "success"})
+
 @app.route('/get_wpm_history/<language>')
 def get_wpm_history(language):
     user_id = session.get('user_id')
@@ -633,6 +710,7 @@ def get_wpm_history(language):
         })
     
     return jsonify({"history": result})
+
 @app.route('/settings')
 def settings():
     if 'user_id' not in session:
@@ -648,6 +726,7 @@ def settings():
     }
     
     return render_template('settings.html', user=user_data)
+
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
     if 'user_id' not in session:
@@ -702,6 +781,7 @@ def update_profile():
     conn.close()
     
     return jsonify({"success": True, "message": "Profile updated successfully!"})
+
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
     if 'user_id' not in session:
@@ -746,6 +826,7 @@ def get_user_best_accuracy():
                 best_accuracy = lang_best
     
     return jsonify({"best_accuracy": best_accuracy})
+
 @app.route('/change_name', methods=['POST'])
 def change_name():
     if 'user_id' not in session:
@@ -838,5 +919,6 @@ def change_password():
     conn.close()
     
     return jsonify({"success": True, "message": "Password changed successfully"})
+
 if __name__ == '__main__':
     app.run(debug=True)
