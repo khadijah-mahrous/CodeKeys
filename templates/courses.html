@@ -7,7 +7,6 @@
 <body style="height:100vh; overflow:hidden; flex-direction:row;">
 
 <div class="sidebar-layout">
-    <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="sidebar-logo" onclick="window.location.href='/'">CodeKeys</div>
         <a href="/" style="text-decoration:none;"><div class="nav-item">🏠 HOME</div></a>
@@ -21,9 +20,7 @@
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="path-container">
-        <!-- Language Navigation Tabs -->
         <div class="course-nav">
             {% if languages %}
                 {% for lang_key, lang_info in languages.items() %}
