@@ -804,5 +804,6 @@ def change_password():
     conn.close()
     
     return jsonify({"success": True, "message": "Password changed successfully"})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
