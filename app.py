@@ -9,8 +9,11 @@ from database import get_db, init_db, save_user, get_user, get_user_by_id, get_u
 from database import *
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here_change_this_12345'
-app.permanent_session_lifetime = 3600
+app.secret_key = 'codekeys_super_secret_2024_xk92jd'
+app.permanent_session_lifetime = 86400  # 24 hours
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 init_db()
 
